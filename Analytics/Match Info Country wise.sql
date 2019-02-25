@@ -15,6 +15,6 @@ JOIN Country on Country.id = Match.country_id
 JOIN League on League.id = Match.league_id
 LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
 LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
-WHERE country_name = 'Spain'
+WHERE country.name = 'Spain'
 ORDER by date
-LIMIT 20;
+LIMIT 10;

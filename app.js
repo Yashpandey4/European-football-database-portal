@@ -7,11 +7,14 @@ var app = require('./ApplicationInstance');
 var flash    = require('connect-flash');
 var cookieParser = require('cookie-parser');
 var session      = require('express-session');
-var configDB = require('./backend/Models/database.js');
 var compression = require('compression');
 var _ = require("underscore");
+
+
 var mainRoutes = require('./backend/routes/MainRoutes');
-var connection = require('./config');
+//====== db require files ==========
+// var connection = require('./config');
+var connection = require('./backend/Models/db_connect.js');
 
 
 //configuration for server ===============================================

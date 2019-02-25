@@ -11,32 +11,33 @@ var app = require('../../ApplicationInstance');
 //================== NORMAL GET REQUEST ROUTER ========================
 //===============================================================
 
+//home page 
 router.route('/').get(mainController.home);
+
+// db request pages
+router.route('/search').get(mainController.search);
+router.route('/update').get(mainController.update);
+router.route('/insert').get(mainController.insert);
+router.route('/database').get(mainController.database);
+router.route('/report').get(mainController.report);
+
+router.route('/sql').get(mainController.sql);
+
 // router.route('/login').get(mainController.login);
-router.route('/admin').get(mainController.admin);
-router.route('/member').get(mainController.member);
-router.route('/company').get(mainController.company);
-router.route('/company/postintern').get(mainController.companyinternform);
-// router.route('/logout').get(mainController.logout);
-router.route('/send').get(mainController.logout);
-router.route('/team').get(mainController.team);
 // router.route('/signup').get(mainController.signup);
+
 //==============================================================
 //================  SPECIAL GET REQUEST ========================
 //================ NOT TO BE USED =============================
 //=============================================================
-router.route('/mail').get(mainController.mail);
-router.route('/verify').get(mainController.verify);
+
 
 
 //==============================================================
 //================== POST REQUEST ROUTER =======================
 //==============================================================
-router.route('/companyPost').post(mainController.companyPost);
+
 router.route('/mem').post(mainController.mem);
-router.route('/mem1').post(mainController.companyforms)
-router.route('/admin').post(mainController.adminpost);
-router.route('/admin1').post(mainController.admin1post);
-// router.route('/login').post(mainController.loginpost);
+
 
 module.exports = router;

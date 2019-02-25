@@ -1,54 +1,139 @@
 /**
- * Created by manish on 28/10/17.
+ * Created by Sunil
  */
-var database = require('../Models/db_model');
-var connection = require('../../config');
-var nodemailer = require('nodemailer');
+var connection = require('../Models/db_connect');
+// var connection = require('../../config');
+// var nodemailer = require('nodemailer');
 
-//creating smtp transport
-var smtpTransport = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    auth: {
-        user: "edciitd2017@gmail.com",
-        pass: "123qwerty123"
-    }
-});
 
 module.exports = {
     home:home,
+    search:search,
+    update:update,
+    insert:insert,
+    database:database,
+    report:report,
     login:login,
-    admin:admin,
-    member:member,
-    company:company,
-    companyinternform:companyinternform,
-    mail:mail,
-    companyPost:companyPost,
-    logout:logout,
-    adminpost:adminpost,
-    admin1post:admin1post,
-    mem:mem,
-    send:send,
     signup:signup,
+    logout:logout,
+    mem:mem,
     loginpost:loginpost,
-    companyforms:companyforms,
-    verify: verify,
-    team:team
+    team:team,
+    sql:sql
 }
 
 //==========================================================
 //========== get request handling==========================
 //==========================================================
 function home(req,res){
-    res.render('index.ejs', {
+    res.render('home.ejs', {
         user:req.session.user
     });
 }
+function search(req,res){
+    res.render('search/search.ejs', {
+        user:req.session.user
+    });
+}
+
+function update(req,res){
+    res.render('update/update.ejs', {
+        user:req.session.user
+    });
+}
+function insert(req,res){
+    res.render('insert/insert.ejs', {
+        user:req.session.user
+    });
+}
+
+function database(req,res){
+    res.render('database/database.ejs', {
+        user:req.session.user
+    });
+}
+
+function report(req,res){
+    res.render('report/report.ejs', {
+        user:req.session.user
+    });
+}
+
 function team(req,res){
     res.render('team/team.ejs', {
         user:req.session.user
     });
 }
+
+function sql(req,res){
+    var query = 'SELECT * from country;' ;
+    connection.query(query,[],(err,result)=>{
+    
+    res.json(result.rows);        
+    })
+}
+
+function getAllCounties(req,res){
+        var query = 'SELECT * from country;' ;
+    connection.query(query,(err,result)=>{
+    res.json(result.rows);        
+    })
+}
+
+function playerByHeight(req,res){
+    var query = "SELECT player_name, height,    CASE\
+        WHEN height < 170.00 THEN 'Short'\
+        WHEN height BETWEEN 170.00 AND 185.00 THEN 'Medium'\
+        WHEN height > 185.00 THEN 'Tall'    \
+        END AS height_class\
+        FROM Player;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    })
+}
+
+function leagueByCountry(req,res){
+    var query = "SELECT Country.id, League.name AS League_name, Country.name AS Country_name\
+    FROM League, Country\
+    WHERE Country.id=League.country_id;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+// function leagueBySeason(req,res){
+//     var query = "SELECT Country.name AS country_name,League.name AS league_name, season,\
+//         count(distinct stage) AS number_of_stages,\
+//         count(distinct HT.team_long_name) AS number_of_teams,\
+//         avg(home_team_goal) AS avg_home_team_scors, \
+//         avg(away_team_goal) AS avg_away_team_goals, \
+//         avg(home_team_goal-away_team_goal) AS avg_goal_dif,\ 
+//         avg(home_team_goal+away_team_goal) AS avg_goals, \
+//         sum(home_team_goal+away_team_goal) AS total_goals \                                      
+//         FROM Match\
+//         JOIN Country on Country.id = Match.country_id\
+//         JOIN League on League.id = Match.league_id\
+//         LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+//         LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+//         WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+//         GROUP BY Country.name, League.name, season\
+//         HAVING count(distinct stage) > 10\
+//         ORDER BY Country.name, League.name, season DESC\
+//         ;"
+//     connection.query(query,(err,result)=>{
+//         res.json(result.rows);        
+//     }) 
+// }
+
+function listAllTeams(req,res){
+    var query = "SELECT * FROM Team ORDER BY team_long_name LIMIT 10;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+
 function login(req,res){
     res.render(
         'login/login.ejs',
@@ -68,6 +153,7 @@ res.render(
 //     return; 
 // });;
 };
+
 function admin(req,res,next){
     // requireRole(req,res,next,'admin');
     if(sessionChecker(req,res,next,'admin'))
@@ -96,26 +182,7 @@ function companyinternform(req,res,next){
         user:req.session.user
     })
 }
-function send(req){
 
-    var mailOptions={
-       to : req.query.to,
-       subject : req.query.subject,
-       text : req.query.text
-    }
-    console.log(mailOptions);
-    smtpTransport.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-            // res.end("error");
-        }
-        else{
-            console.log("Message sent: " + response.message);
-            // res.end("sent");
-        }
-    });
-
-};
 
 //========= Logout ==================================
 function logout(req,res){

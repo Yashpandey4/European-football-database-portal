@@ -1,11 +1,11 @@
--- Leagues by Season Analytics
+-- country-league-season level analytics
 
 SELECT Country.name AS country_name, 
         League.name AS league_name, 
         season,
         count(distinct stage) AS number_of_stages,
         count(distinct HT.team_long_name) AS number_of_teams,
-        avg(home_team_goal) AS avg_home_team_scors, 
+        avg(home_team_goal) AS avg_home_team_goals, 
         avg(away_team_goal) AS avg_away_team_goals, 
         avg(home_team_goal-away_team_goal) AS avg_goal_dif, 
         avg(home_team_goal+away_team_goal) AS avg_goals, 
