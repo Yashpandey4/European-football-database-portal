@@ -22,6 +22,9 @@ module.exports = {
     loginpost:loginpost,
     team:team,
     manager:manager,
+    player:player,
+    match:match,
+    country:country,
     sql:sql
 }
 
@@ -54,6 +57,27 @@ function insert(req,res){
 function manager(req,res){
     console.log(req.session.user);
     res.render('report/report.ejs',{
+        user:req.session.user
+    })
+}
+
+function match(req,res){
+    console.log(req.session.user);
+    res.render('match/match.ejs',{
+        user:req.session.user
+    })
+}
+
+function player(req,res){
+    console.log(req.session.user);
+    res.render('player/player.ejs',{
+        user:req.session.user
+    })
+}
+
+function country(req,res){
+    console.log(req.session.user);
+    res.render('country/country.ejs',{
         user:req.session.user
     })
 }
