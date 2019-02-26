@@ -25,6 +25,9 @@ module.exports = {
     player:player,
     match:match,
     country:country,
+    playerList:playerList,
+    playerStat:playerStat,
+    countryList:countryList,
     sql:sql
 }
 
@@ -379,6 +382,14 @@ function team(req,res){
     });
 }
 
+function playerStat(res,req){
+
+}
+
+function playerList(res,req){
+
+}
+
 function sql(req,res){
     var query = 'SELECT * from country;' ;
     connection.query(query,[],(err,result)=>{
@@ -387,8 +398,17 @@ function sql(req,res){
     })
 }
 
+function countryList(req,res){
+    var obj = [];
+    var query = 'SELECT name from country;' ;
+    connection.query(query,(err,result)=>{
+    obj.push({country:result.rows})
+    res.json(obj);        
+    })
+}
+
 function getAllCounties(req,res){
-        var query = 'SELECT * from country;' ;
+    var query = 'SELECT * from country;' ;
     connection.query(query,(err,result)=>{
     res.json(result.rows);        
     })
