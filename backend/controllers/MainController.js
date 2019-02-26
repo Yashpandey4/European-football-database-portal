@@ -406,16 +406,17 @@ function countryList(req,res){
     })
 }
 
-function countryAdd(res,req){
+function countryAdd(req,res){
+    console.log(req.body);
     var query = 'Insert into country (name) VALUES('+'\''+req.body.name+'\''+')';
     connection.query(query,(err,result)=>{
     if(err) {
         // throw err;
         res.send({error:true,message:"Counrty already present"})
     }
-    else if(!results.rowCount==0)
+    else if(!result.rowCount==0)
     {
-            console.log(results);
+            console.log(result);
             res.send({error:false,message:"country : "+req.body.name+" added"});
     }
     else
@@ -444,7 +445,7 @@ function playerStat(req,res){
     if(code==1){
         playersByBirthYear(req,res);
     }else if(code == 2){
-        playerByHeight(req,res);
+        playersByHeight(req,res);
     }
     else if(code == 3){
         playersByYearNumber(req,res);

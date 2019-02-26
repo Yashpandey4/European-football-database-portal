@@ -97,7 +97,7 @@ function setter(id){
           <option placeholder="">Category</option>\
           <option onclick="statPost(1);">PLAYER  By Birth</option>\
           <option onclick="statPost(2);">PLAYER  By Height</option>\
-          <option>NATIONALITY</option>\
+          <option onclick="statPost(3);">PLAYER  By Year</option>\
           <option>AGE</option>\
           <option>OVERALL RATING</option>\
           <option>TEAM</option>\
@@ -165,14 +165,21 @@ function setter(id){
           </form>\
           "
         }
-  else if("country"){
-	$.post("/country/list").done((data,status)=>{
-	  console.log(data)
-	  createTable(data,usr);
-	})
-
+  else if(id =="addCountry"){
+    usr.innerHTML += "<h1 style='text-align:center;color:white'>Create New Country</h1><br>"
+    usr.innerHTML += "<form style='text-align:center;color:white;padding:auto;' id='counform' action='/country/add' method='POST'>\
+                      <label for='name'>Country Name</label>\
+                     <input type='text' id='name' name='name' required></input><br><br>\
+                      <button type='submit' style='padding:5px'>Submit</button>\
+                      </form>\
+                     "
   }
-
+  else if(id == "country"){
+	$.post("/country/list").done((data,status)=>{
+	  //console.log(data)
+	  createTable(data,usr);
+	});
+  }
 }
 
 
