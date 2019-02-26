@@ -409,6 +409,7 @@ function countryList(req,res){
 }
 
 function countryAdd(res,req){
+    console.log(req.body);
     var query = 'Insert into country (name) VALUES('+'\''+req.body.name+'\''+')';
     connection.query(query,(err,result)=>{
     if(err) {

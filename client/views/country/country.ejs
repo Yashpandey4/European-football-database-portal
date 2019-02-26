@@ -62,7 +62,7 @@
   </section>
 </section>
   <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-    <script src="scripts/request.js"></script>
+    <script src="/scripts/request.js"></script>
     
     <script>
       var usr = document.getElementById("hello");
@@ -73,6 +73,26 @@
         setter("country")
       }
     </script>
+  <!--  <script>
+      function mycountry(){
+        var formdata = {};
+        $.each($('#counform').serializeArray(), function(_, kv) {
+          formdata[kv.name] = kv.value;
+        });
+        console.log(formdata);
+        return false;
+
+        $.post("/country/add",formdata)
+        .done((data,status)=>{
+              console.log(status);
+              console.log(data);
+              //window.location.href = "/country";
+        }).fail((jqXHR, textStatus, errorThrown)=>{
+          console.log(textStatus);
+          console.log(errorThrown);
+        })
+      }
+    </script> -->
 </body>
 
 </html>
