@@ -12,8 +12,8 @@
       <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
        <link rel="stylesheet" href="styles/style.css">
 
-    <link href="styles/menu.css" rel="stylesheet" type="text/css">
-    <link href="styles/searchbar.css" rel="stylesheet" /
+    <link href="/styles/menu.css" rel="stylesheet" type="text/css">
+    <link href="/styles/searchbar.css" rel="stylesheet" /
   
 </head>
 
@@ -28,7 +28,12 @@
 
   <section>
 <%include ../partials/_navbar.ejs%>
-       
+       <br><br>
+      <ul class="menu cf"> 
+        <li><a onclick="setter('coun');">Country</a></li>
+        <li><a onclick="setter('cplayer')";>Create Player</a></li>
+        <li><a onclick="setter('cteam')";>Create Team</a></li>
+      </ul>
        <h1>Report</h1>
       
   <defs>
@@ -57,14 +62,19 @@
       <rect id="dot-js" x="80" y="352" width="32" height="32" rx="16"></rect>
     </g>
 </section>
-
+<section id="hello">
+  </section>
 
   <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-
-
-    <script src='js/4032af61ca0478304ab7b31b7.js'></script>
-
-    <script  src="js/index.js"></script>
+  <script src="/scripts/request.js"></script>
+  <script>
+        window.onload = function(){
+        // $.post("/database").done((data,status)=>{
+        //   createTable(data,usr);
+        // })
+        setter("coun")
+      }
+    </script>
 
 
 </body>
