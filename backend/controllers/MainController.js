@@ -211,6 +211,180 @@ ORDER BY Country.name, League.name, season DESC\
     }) 
 }
 
+function playersByBirthYear(req,res){
+    var query = "SELECT COUNT(p.player_name) AS number_of_players, \
+--strftime('%Y',p.birthday) AS \"year_born\"\
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss')) AS "year_born"\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+GROUP BY year_born;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function playeysByHeight(req,res){
+    var query = "SELECT CASE\
+    WHEN ROUND(height)<165 then 165\
+    WHEN ROUND(height)>195 then 195\
+    ELSE ROUND(height)\
+    END AS calc_height, \
+    COUNT(height) AS distribution, \
+    (avg(PA_Grouped.avg_overall_rating)) AS avg_overall_rating,\
+    (avg(PA_Grouped.avg_potential)) AS avg_potential,\
+    AVG(weight) AS avg_weight \
+FROM PLAYER\
+LEFT JOIN (SELECT Player_Attributes.player_api_id, \
+    avg(Player_Attributes.overall_rating) AS avg_overall_rating,\
+    avg(Player_Attributes.potential) AS avg_potential  \
+    FROM Player_Attributes\
+    GROUP BY Player_Attributes.player_api_id) \
+    AS PA_Grouped ON PLAYER.player_api_id = PA_Grouped.player_api_id\
+GROUP BY calc_height\
+ORDER BY calc_height\
+; "
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function playersByYearNumber(req,res){
+    var query = "SELECT \
+COUNT(p.player_name) AS number_of_players, \
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\"\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+GROUP BY year_born\
+HAVING EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int > '1990';"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function playerInfoByBirthYear(req,res){
+    var query = "SELECT \
+COUNT(p.player_name) AS number_of_players, \
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
+MIN(pa.overall_rating) AS min_overall_rating,\
+MAX(pa.overall_rating) AS max_overall_rating, \
+AVG(pa.overall_rating) AS average_overall_rating\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+GROUP BY year_born;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function RatingsByYearNumber(req,res){
+    var query = "SELECT \
+COUNT(p.player_name) AS number_of_players, \
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
+MIN(pa.overall_rating) AS min_overall_rating,\
+MAX(pa.overall_rating) AS max_overall_rating, \
+AVG(pa.overall_rating) AS average_overall_rating\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+GROUP BY year_born;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function sortByPlayerInfo(req,res){
+    var query = "SELECT \
+p.player_name,\
+--*,\
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
+-- 2019-(CAST(coalesce(year_born, '0') AS integer)) AS \"player_age\"\
+2019::int-(select EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int) AS age,\
+pa.overall_rating,pa.potential,pa.preferred_foot,pa.attacking_work_rate,pa.defensive_work_rate,pa.crossing,pa.finishing,pa.heading_accuracy,pa.short_passing,pa.volleys,pa.dribbling,pa.curve,pa.free_kick_accuracy,pa.long_passing,pa.ball_control,pa.acceleration,pa.sprint_speed,pa.agility,pa.reactions,pa.balance,pa.shot_power,pa.jumping,pa.stamina,pa.strength,pa.long_shots,pa.aggression,pa.interceptions,pa.positioning,pa.vision,pa.penalties,pa.marking,pa.standing_tackle,pa.sliding_tackle,pa.gk_diving,pa.gk_handling,pa.gk_kicking,pa.gk_positioning,pa.gk_reflexes\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+--WHERE (Insert Sorting Attribute here > Insert threshhold value)\
+ORDER BY p.player_name\
+LIMIT 10\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function teamInfo(req,res){
+    var query = "SELECT * FROM Team, Team_Attributes\
+WHERE Team.team_api_id = Team_Attributes.team_api_id\
+ORDER BY Team.team_long_name;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function bestTeamsSeasonWise(req,res){
+    var query = "SELECT Country.name AS country_name, \
+        League.name AS league_name,\
+        HT.team_long_name,\
+        season,\
+        count(distinct stage) AS number_of_stages,\
+        -- count(distinct HT.team_long_name) AS number_of_teams,\
+        avg(home_team_goal) AS avg_home_team_goals, \
+        avg(away_team_goal) AS avg_away_team_goals, \
+        avg(home_team_goal-away_team_goal) AS avg_goal_dif, \
+        avg(home_team_goal+away_team_goal) AS avg_goals, \
+        sum(home_team_goal+away_team_goal) AS total_goals                                       \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+--WHERE league.name in () --best teams in a given league\
+--WHERE season in () --best teams in a given season\
+GROUP BY HT.team_long_name, Country.name, League.name, season\
+--HAVING count(distinct stage) > 10\
+ORDER BY total_goals DESC, Country.name, League.name, season DESC\
+LIMIT 10\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function bestTeamsOfAllTimes(req,res){
+    var query = "SELECT Country.name AS country_name, \
+        League.name AS league_name,\
+        HT.team_long_name,\
+        --season,\
+        count(distinct stage) AS number_of_stages,\
+        -- count(distinct HT.team_long_name) AS number_of_teams,\
+        avg(home_team_goal) AS avg_home_team_goals, \
+        avg(away_team_goal) AS avg_away_team_goals, \
+        avg(home_team_goal-away_team_goal) AS avg_goal_dif, \
+        avg(home_team_goal+away_team_goal) AS avg_goals, \
+        sum(home_team_goal+away_team_goal) AS total_goals                                       \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+--WHERE league.name in () --best teams in a given league\
+GROUP BY HT.team_long_name, Country.name, League.name\
+--HAVING count(distinct stage) > 10\
+ORDER BY total_goals DESC, Country.name, League.name\
+LIMIT 10\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+
 
 function login(req,res){
     res.render(
