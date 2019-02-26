@@ -28,7 +28,9 @@
 <%include ../partials/_navbar.ejs%>
       <br>
       <ul class="menu cf"> 
-        <li><a onclick="setter('stat');">Stats</a></li>
+        <li>
+          <a onclick="setter('stat');">Stats</a>
+        </li>
         <li><a onclick="setter('player')";>Players</a></li>
        </ul>
       
@@ -61,6 +63,7 @@
 <section id="hello">
   </section>
 </section>
+<svg></svg>
   <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
     <script src="scripts/request.js"></script>
     
@@ -73,6 +76,7 @@
         setter("player")
       }
     </script>
+  <script src="/scripts/playerStats.js"></script>
 </body>
 
 </html>
