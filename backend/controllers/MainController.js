@@ -48,10 +48,47 @@ function insert(req,res){
 }
 
 function database(req,res){
-    res.render('database/database.ejs', {
-        user:req.session.user
-    });
+    getAllDbImage(req,res);
+    // res.render('database/database.ejs', {
+    //     user:req.session.user
+    // });
 }
+// get all db image
+function getAllDbImage(req,res){
+    var query1 = "select * from country limit 5";
+    var query2 = "select * from league limit 5";
+    var query3 = "select * from match  where home_player_x1 is not NULL limit 5";
+    var query4 = "select * from player limit 5";
+    var query5 = "select * from player_attributes limit 5";
+    var query6 = "select * from team limit 5";
+    var query7 = "select * from team_attributes limit 5";
+
+    obj = []
+    connection.query(query1,(err,result)=>{
+        obj.push({country:result.rows});
+        connection.query(query2,(err,result)=>{
+            obj.push({league:result.rows});
+            connection.query(query3,(err,result)=>{
+                obj.push({match:result.rows});
+                connection.query(query4,(err,result)=>{
+                    obj.push({player:result.rows});
+                    connection.query(query5,(err,result)=>{
+                        obj.push({playerAttr:result.rows});
+                        connection.query(query6,(err,result)=>{
+                            obj.push({team:result.rows});
+                            connection.query(query7,(err,result)=>{
+                                obj.push({teamAttr:result.rows});
+                                res.json(obj);
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    })
+
+}
+
 
 function report(req,res){
     res.render('report/report.ejs', {
@@ -1229,14 +1266,14 @@ function login(req,res){
         'login/login.ejs',
         {
             user:req.session.user,
-            message: req.flash('loginMessage')
+            message: 'loginMessage'
         }
     );
 }
 function signup(req, res) {
 res.render(
-    'login/login.ejs',
-     {message: req.flash('signupMessage')}
+    'signup/signup.ejs',
+     {message: 'signupMessage'}
      );
 // (function(){
 //     if(true)

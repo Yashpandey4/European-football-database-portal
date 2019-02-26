@@ -64,92 +64,92 @@ var sessionChecker = (req, res, next) => {
 //==========================================================================
 
 // route for user signup
-app.route('/signup')
-    .get(sessionChecker, (req, res) => {
-        res.render('login/login.ejs',{
-            user:req.session.user,
-            message: ''
-        });
-    })
-    .post((req, res) => {
-        User.create({
-            name: req.body.first_name,
-            lastname: req.body.last_name,
-            email: req.body.email,
-            password: req.body.password,
-            Role: 'member',
-            verify: 0
-        })
-        .then(user => {
-            checkEmail(req.session.user.email);
-            req.session.user = user.dataValues;
-            res.redirect('/member');
-        })
-        .catch(error => {
-            res.render('login/login.ejs',{
-                user: null,
-                message: 'Email id is already in use'
-            });
-        });
-    });
+// app.route('/signup')
+//     .get(sessionChecker, (req, res) => {
+//         res.render('login/login.ejs',{
+//             user:req.session.user,
+//             message: ''
+//         });
+//     })
+//     .post((req, res) => {
+//         User.create({
+//             name: req.body.first_name,
+//             lastname: req.body.last_name,
+//             email: req.body.email,
+//             password: req.body.password,
+//             Role: 'member',
+//             verify: 0
+//         })
+//         .then(user => {
+//             checkEmail(req.session.user.email);
+//             req.session.user = user.dataValues;
+//             res.redirect('/member');
+//         })
+//         .catch(error => {
+//             res.render('login/login.ejs',{
+//                 user: null,
+//                 message: 'Email id is already in use'
+//             });
+//         });
+//     });
 
-app.route('/signup1')
-    .post((req, res) => {
-        User.create({
-            name: req.body.company_name,
-            //lastname: req.body.last_name,
-            email: req.body.email,
-            Role : 'company',
-            password: req.body.password,
-            verify:0
-        })
-        .then(user => {
-            req.session.user = user.dataValues;
-            checkEmail(req.session.user.email);
-            res.redirect('/company');
-        })
-        .catch(error => {
-            res.redirect('/signup');
-        });
-    });
+// app.route('/signup1')
+//     .post((req, res) => {
+//         User.create({
+//             name: req.body.company_name,
+//             //lastname: req.body.last_name,
+//             email: req.body.email,
+//             Role : 'company',
+//             password: req.body.password,
+//             verify:0
+//         })
+//         .then(user => {
+//             req.session.user = user.dataValues;
+//             checkEmail(req.session.user.email);
+//             res.redirect('/company');
+//         })
+//         .catch(error => {
+//             res.redirect('/signup');
+//         });
+//     });
 
-// route for user Login
-app.route('/login')
-    .get(sessionChecker, (req, res) => {
-        res.render('login/login.ejs',{
-            user:req.session.user,
-            message:''
-        });
-    })
-    .post((req, res) => {
-        var email = req.body.email,
-            password = req.body.password;
+// // route for user Login
+// app.route('/login')
+//     .get(sessionChecker, (req, res) => {
+//         res.render('login/login.ejs',{
+//             user:req.session.user,
+//             message:''
+//         });
+//     })
+//     .post((req, res) => {
+//         var email = req.body.email,
+//             password = req.body.password;
 
-        User.findOne({ where: { email: email } }).then(function (user) {
-            if (!user) {
-                res.render('login/login.ejs',{
-                    user: null,
-                    message: 'User does not exit'
-                });
-            } else if (!user.validPassword(password)) {
-                res.render('login/login.ejs',{
-                    user: null,
-                    message: 'Oops! wrong password'
-                });
-            }else if(user.verify ===0){
-                checkEmail(user.email);
-                res.render('login/login.ejs',{
-                    user:null,
-                    message: 'Please verify your account email sent'
-                });
+//         User.findOne({ where: { email: email } }).then(function (user) {
+//             if (!user) {
+//                 res.render('login/login.ejs',{
+//                     user: null,
+//                     message: 'User does not exit'
+//                 });
+//             } else if (!user.validPassword(password)) {
+//                 res.render('login/login.ejs',{
+//                     user: null,
+//                     message: 'Oops! wrong password'
+//                 });
+//             }else if(user.verify ===0){
+//                 checkEmail(user.email);
+//                 res.render('login/login.ejs',{
+//                     user:null,
+//                     message: 'Please verify your account email sent'
+//                 });
 
-            }
-             else {
-                req.session.user = user.dataValues;
-                res.redirect(req.session.user.Role);
-            }
-        });
-    });
+//             }
+//              else {
+//                 req.session.user = user.dataValues;
+//                 res.redirect(req.session.user.Role);
+//             }
+//         });
+//     });
 
 
 // route for user's dashboard
