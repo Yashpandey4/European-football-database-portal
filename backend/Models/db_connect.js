@@ -5,7 +5,6 @@ const client = new Client({
   host: 'localhost',
   database: 'fifa',
   password: '1234',
-
   port: 5432,
 })
 client.connect(function(err){

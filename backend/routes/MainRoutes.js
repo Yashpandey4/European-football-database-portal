@@ -46,6 +46,7 @@ router.route('/signup').post(mainController.signuppost);
 router.route('/player/player').post(mainController.playerList);
 router.route('/player/stat').post(mainController.playerStat);
 router.route('/country/list').post(mainController.countryList);
+router.route('/country/add').post(mainController.countryAdd);
 
 
 
