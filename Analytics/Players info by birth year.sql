@@ -2,7 +2,7 @@
 
 SELECT 
 COUNT(p.player_name) AS number_of_players, 
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS "year_born"
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS "year_born",
 MIN(pa.overall_rating) AS min_overall_rating,
 MAX(pa.overall_rating) AS max_overall_rating, 
 AVG(pa.overall_rating) AS average_overall_rating

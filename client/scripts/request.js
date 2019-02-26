@@ -74,21 +74,21 @@ function setter(id){
   var usr = document.getElementById("hello");
   usr.innerHTML = "";
   if(id=="player"){
-  	usr.innerHTML += ' <div class="selector">\
-  			<div class="input-select" align="center" width="480" heig>\
-  			  <select data-trigger="" name="choices-single-default">\
-  				<option placeholder="">Category</option>\
-  				<option onclick="playerPost(1);">PLAYER NAME</a></option>\
-  				<option>PLAYER ID</option>\
-  				<option>NATIONALITY</option>\
-  				<option>AGE</option>\
-  				<option>OVERALL RATING</option>\
-  				<option>TEAM</option>\
-  				<option>PLAYING POSITION</option>\
-  			  </select>\
-  			</div>\
-  		  </div>\
-  	</div>'
+  	usr.innerHTML += '<div class="selector">\
+        <div class="input-select" align="center" width="480" heig>\
+          <select data-trigger="" name="choices-single-default">\
+          <option placeholder="">Category</option>\
+          <option onclick="playerPost(1);">PLAYER  By Height</option>\
+          <option onclick="playerPost(2);">PLAYER  By </option>\
+          <option onclick="playerPost(3);">PLAYER  By Year</option>\
+          <option onclick="playerPost(4);">PLAYER  Info by Birth</option>\
+          <option onclick="playerPost(5);">PLAYER Rating</option>\
+          <option>TEAM</option>\
+          <option>PLAYING POSITION</option>\
+          </select>\
+        </div>\
+        </div>\
+    </div><section id="stat"></section>'
   }
   else if(id=="stat"){
     usr.innerHTML += ' <div class="selector">\
@@ -98,8 +98,8 @@ function setter(id){
           <option onclick="statPost(1);">PLAYER  By Birth</option>\
           <option onclick="statPost(2);">PLAYER  By Height</option>\
           <option onclick="statPost(3);">PLAYER  By Year</option>\
-          <option>AGE</option>\
-          <option>OVERALL RATING</option>\
+          <option onclick="statPost(4);">PLAYER  Info by Birth</option>\
+          <option onclick="statPost(5);">PLAYER Rating</option>\
           <option>TEAM</option>\
           <option>PLAYING POSITION</option>\
           </select>\
@@ -185,7 +185,7 @@ function setter(id){
 
 function playerPost(id){
   var obj = {code:id};
-	$.post("/player/player").done((data,status)=>{
+	$.post("/player/player",obj).done((data,status)=>{
 	  createTable(data,usr);
 	})
 }

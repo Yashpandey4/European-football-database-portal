@@ -385,9 +385,7 @@ function team(req,res){
 
 
 
-function playerList(res,req){
 
-}
 
 function sql(req,res){
     var query = 'SELECT * from country;' ;
@@ -449,6 +447,10 @@ function playerStat(req,res){
     }
     else if(code == 3){
         playersByYearNumber(req,res);
+    }else if(code == 4){
+        playerInfoByBirthYear(req,res);
+    }else if(code ==5){
+        RatingsByYearNumber(req,res)
     }
 
 }
@@ -530,50 +532,90 @@ HAVING EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int
 }
 
 function playerInfoByBirthYear(req,res){
-    var query = "SELECT \
-COUNT(p.player_name) AS number_of_players, \
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
-MIN(pa.overall_rating) AS min_overall_rating,\
-MAX(pa.overall_rating) AS max_overall_rating, \
-AVG(pa.overall_rating) AS average_overall_rating\
-FROM Player AS p\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
-GROUP BY year_born;"
+    var query = `SELECT COUNT(p.player_name) AS number_of_players, 
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS "year_born",
+MIN(pa.overall_rating) AS min_overall_rating,
+MAX(pa.overall_rating) AS max_overall_rating, 
+AVG(pa.overall_rating) AS average_overall_rating
+FROM Player AS p
+INNER JOIN Player_Attributes AS pa 
+ON p.player_api_id = pa.player_api_id
+GROUP BY year_born;`
+var obj =[];
     connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 function RatingsByYearNumber(req,res){
-    var query = "SELECT \
-COUNT(p.player_name) AS number_of_players, \
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
-MIN(pa.overall_rating) AS min_overall_rating,\
-MAX(pa.overall_rating) AS max_overall_rating, \
-AVG(pa.overall_rating) AS average_overall_rating\
-FROM Player AS p\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
-GROUP BY year_born;"
-    connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var val = req.body.value;
+    if(!val){
+        val = 90
+    }
+    var query = `SELECT 
+COUNT(p.player_name) AS number_of_players, 
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS "year_born"
+FROM Player AS p
+INNER JOIN Player_Attributes AS pa 
+ON p.player_api_id = pa.player_api_id
+WHERE pa.overall_rating > $1
+GROUP BY year_born;`
+var obj =[];
+    connection.query(query,[val],(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 //==============================================================
+//=====================Player List==============================
 //==============================================================
-//==============================================================
+
+function playerList(req,res){
+    var code = req.body.code;
+    console.log(code)
+    if(code==1){
+        playerByHeight(req,res);
+    }else if(code == 2){
+        playeysByHeight(req,res);
+    }
+    else if(code == 3){
+        playersByYearNumber(req,res);
+    }else if(code == 4){
+        playerInfoByBirthYear(req,res);
+    }else if(code ==5){
+        RatingsByYearNumber(req,res)
+    }
+}
+
 function playerByHeight(req,res){
-    var query = "SELECT player_name, height,    CASE\
-        WHEN height < 170.00 THEN 'Short'\
-        WHEN height BETWEEN 170.00 AND 185.00 THEN 'Medium'\
-        WHEN height > 185.00 THEN 'Tall'    \
-        END AS height_class\
-        FROM Player;"
+    var query = `SELECT player_name, height,    CASE
+        WHEN height < 170.00 THEN 'Short'
+        WHEN height BETWEEN 170.00 AND 185.00 THEN 'Medium'
+        WHEN height > 185.00 THEN 'Tall'    
+        END AS height_class
+        FROM Player order by height;`
+    var obj =[];
     connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    })
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
+    }) 
 }
 
 function leagueByCountry(req,res){
