@@ -383,9 +383,7 @@ function team(req,res){
     });
 }
 
-function playerStat(res,req){
 
-}
 
 function playerList(res,req){
 
@@ -435,6 +433,136 @@ function getAllCounties(req,res){
     })
 }
 
+//=====================================================================
+//========================    Player  Stats      ======================
+//=====================================================================
+
+
+function playerStat(req,res){
+    var code = req.body.code;
+    console.log(code)
+    if(code==1){
+        playersByBirthYear(req,res);
+    }else if(code == 2){
+        playerByHeight(req,res);
+    }
+    else if(code == 3){
+        playersByYearNumber(req,res);
+    }
+
+}
+
+
+
+function playersByBirthYear(req,res){
+    var query = `SELECT COUNT(p.player_name) AS number_of_players, 
+--strftime('%Y',p.birthday) AS "year_born"
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss')) AS "year_born"
+FROM Player AS p
+INNER JOIN Player_Attributes AS pa 
+ON p.player_api_id = pa.player_api_id
+GROUP BY year_born;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
+    }) 
+}
+
+function playeysByHeight(req,res){
+    var query = `SELECT CASE
+    WHEN ROUND(height)<165 then 165
+    WHEN ROUND(height)>195 then 195
+    ELSE ROUND(height)
+    END AS calc_height, 
+    COUNT(height) AS distribution, 
+    (avg(PA_Grouped.avg_overall_rating)) AS avg_overall_rating,
+    (avg(PA_Grouped.avg_potential)) AS avg_potential,
+    AVG(weight) AS avg_weight 
+FROM PLAYER
+LEFT JOIN (SELECT Player_Attributes.player_api_id, 
+    avg(Player_Attributes.overall_rating) AS avg_overall_rating,
+    avg(Player_Attributes.potential) AS avg_potential  
+    FROM Player_Attributes
+    GROUP BY Player_Attributes.player_api_id) 
+    AS PA_Grouped ON PLAYER.player_api_id = PA_Grouped.player_api_id
+GROUP BY calc_height
+ORDER BY calc_height
+; `
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+            console.log(result.rows)
+            res.json(obj);  
+        }      
+    }) 
+}
+
+function playersByYearNumber(req,res){
+    var query = `SELECT 
+COUNT(p.player_name) AS number_of_players, 
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS "year_born"
+FROM Player AS p
+INNER JOIN Player_Attributes AS pa 
+ON p.player_api_id = pa.player_api_id
+GROUP BY year_born
+HAVING EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int > '1990';`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
+    }) 
+}
+
+function playerInfoByBirthYear(req,res){
+    var query = "SELECT \
+COUNT(p.player_name) AS number_of_players, \
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
+MIN(pa.overall_rating) AS min_overall_rating,\
+MAX(pa.overall_rating) AS max_overall_rating, \
+AVG(pa.overall_rating) AS average_overall_rating\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+GROUP BY year_born;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function RatingsByYearNumber(req,res){
+    var query = "SELECT \
+COUNT(p.player_name) AS number_of_players, \
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
+MIN(pa.overall_rating) AS min_overall_rating,\
+MAX(pa.overall_rating) AS max_overall_rating, \
+AVG(pa.overall_rating) AS average_overall_rating\
+FROM Player AS p\
+INNER JOIN Player_Attributes AS pa \
+ON p.player_api_id = pa.player_api_id\
+GROUP BY year_born;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+//==============================================================
+//==============================================================
+//==============================================================
 function playerByHeight(req,res){
     var query = "SELECT player_name, height,    CASE\
         WHEN height < 170.00 THEN 'Short'\
@@ -566,88 +694,6 @@ ORDER BY Country.name, League.name, season DESC\
     }) 
 }
 
-function playersByBirthYear(req,res){
-    var query = "SELECT COUNT(p.player_name) AS number_of_players, \
---strftime('%Y',p.birthday) AS \"year_born\"\
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss')) AS 'year_born'\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
-GROUP BY year_born;"
-    connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
-
-function playeysByHeight(req,res){
-    var query = "SELECT CASE\
-    WHEN ROUND(height)<165 then 165\
-    WHEN ROUND(height)>195 then 195\
-    ELSE ROUND(height)\
-    END AS calc_height, \
-    COUNT(height) AS distribution, \
-    (avg(PA_Grouped.avg_overall_rating)) AS avg_overall_rating,\
-    (avg(PA_Grouped.avg_potential)) AS avg_potential,\
-    AVG(weight) AS avg_weight \
-FROM PLAYER\
-LEFT JOIN (SELECT Player_Attributes.player_api_id, \
-    avg(Player_Attributes.overall_rating) AS avg_overall_rating,\
-    avg(Player_Attributes.potential) AS avg_potential  \
-    FROM Player_Attributes\
-    GROUP BY Player_Attributes.player_api_id) \
-    AS PA_Grouped ON PLAYER.player_api_id = PA_Grouped.player_api_id\
-GROUP BY calc_height\
-ORDER BY calc_height\
-; "
-    connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
-
-function playersByYearNumber(req,res){
-    var query = "SELECT \
-COUNT(p.player_name) AS number_of_players, \
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\"\
-FROM Player AS p\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
-GROUP BY year_born\
-HAVING EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int > '1990';"
-    connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
-
-function playerInfoByBirthYear(req,res){
-    var query = "SELECT \
-COUNT(p.player_name) AS number_of_players, \
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
-MIN(pa.overall_rating) AS min_overall_rating,\
-MAX(pa.overall_rating) AS max_overall_rating, \
-AVG(pa.overall_rating) AS average_overall_rating\
-FROM Player AS p\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
-GROUP BY year_born;"
-    connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
-
-function RatingsByYearNumber(req,res){
-    var query = "SELECT \
-COUNT(p.player_name) AS number_of_players, \
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
-MIN(pa.overall_rating) AS min_overall_rating,\
-MAX(pa.overall_rating) AS max_overall_rating, \
-AVG(pa.overall_rating) AS average_overall_rating\
-FROM Player AS p\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
-GROUP BY year_born;"
-    connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
 
 function sortByPlayerInfo(req,res){
     var query = "SELECT \
