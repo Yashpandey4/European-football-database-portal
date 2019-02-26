@@ -28,6 +28,7 @@ module.exports = {
     playerList:playerList,
     playerStat:playerStat,
     countryList:countryList,
+    countryAdd:countryAdd,
     sql:sql
 }
 
@@ -406,6 +407,26 @@ function countryList(req,res){
     res.json(obj);        
     })
 }
+
+function countryAdd(res,req){
+    var query = 'Insert into country (name) VALUES('+'\''+req.body.name+'\''+')';
+    connection.query(query,(err,result)=>{
+    if(err) {
+        // throw err;
+        res.send({error:true,message:"Counrty already present"})
+    }
+    else if(!results.rowCount==0)
+    {
+            console.log(results);
+            res.send({error:false,message:"country : "+req.body.name+" added"});
+    }
+    else
+    {
+        res.redirect({error:true,message:"Counrty already present"});
+    }
+    })
+}
+
 
 function getAllCounties(req,res){
     var query = 'SELECT * from country;' ;
