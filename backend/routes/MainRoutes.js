@@ -23,8 +23,8 @@ router.route('/report').get(mainController.report);
 
 router.route('/sql').get(mainController.sql);
 
-// router.route('/login').get(mainController.login);
-// router.route('/signup').get(mainController.signup);
+router.route('/login').get(mainController.login);
+router.route('/signup').get(mainController.signup);
 
 //==============================================================
 //================  SPECIAL GET REQUEST ========================
