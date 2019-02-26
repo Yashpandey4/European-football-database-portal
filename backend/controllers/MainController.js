@@ -12,6 +12,7 @@ module.exports = {
     update:update,
     insert:insert,
     database:database,
+    database1:database1,
     report:report,
     login:login,
     signup:signup,
@@ -48,6 +49,12 @@ function insert(req,res){
 }
 
 function database(req,res){
+   //getAllDbImage(req,res);
+    res.render('database/database.ejs', {
+      user:req.session.user
+    });
+}
+function database1(req,res){
     getAllDbImage(req,res);
     // res.render('database/database.ejs', {
     //     user:req.session.user
@@ -161,7 +168,7 @@ function leagueByCountry(req,res){
 //         res.json(result.rows);        
 //     }) 
 // }
-
+/*
 function listAllTeams(req,res){
     var query = "SELECT * FROM Team ORDER BY team_long_name LIMIT 10;"
     connection.query(query,(err,result)=>{
@@ -1259,7 +1266,7 @@ LIMIT 10\
     }) 
 }
 
-
+*/
 
 function login(req,res){
     res.render(

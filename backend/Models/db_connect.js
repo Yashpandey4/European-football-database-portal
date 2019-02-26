@@ -4,13 +4,14 @@ const client = new Client({
   user: 'postgres',
   host: 'localhost',
   database: 'postgres',
-  password: '1234',
+  password: process.env.Password,
   port: 5432,
 })
 client.connect(function(err){
     if(!err) {
         console.log("Database is connected");
     } else {
+        console.log(err);
         console.log("Error while connecting with database");
  		// console.log(err);
     }
