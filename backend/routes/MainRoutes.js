@@ -22,6 +22,9 @@ router.route('/database').get(mainController.database);
 router.route('/database').post(mainController.database1);
 router.route('/report').get(mainController.report);
 router.route('/manager').get(mainController.manager);
+router.route('/country').get(mainController.country);
+router.route('/player').get(mainController.player);
+router.route('/match').get(mainController.match);
 router.route('/sql').get(mainController.sql);
 
 router.route('/login').get(mainController.login);
@@ -40,6 +43,8 @@ router.route('/logout').get(mainController.logout);
 //==============================================================
 router.route('/login').post(mainController.loginpost);
 router.route('/signup').post(mainController.signuppost);
+// router.route('/player/player').post(mainController.playerList);
+// router.route('/player/stat').post(mainController.playerstat);
 
 
 
