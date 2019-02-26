@@ -1,12 +1,12 @@
 function logout(){
-	localStorage.removeItem('RDV');
+	localStorage.removeItem('fifa');
     window.location.reload();
 }
-function pronite_logout(){
-	localStorage.removeItem('Pronite');
-	localStorage.removeItem('UserPronite');
-    window.location.reload();
-}
+// function pronite_logout(){
+// 	localStorage.removeItem('Pronite');
+// 	localStorage.removeItem('UserPronite');
+//     window.location.reload();
+// }
 
 function check(){
 	var el = document.getElementById("thug");
@@ -25,8 +25,8 @@ function check(){
 		$.post("/api/login",{"token":token})
 		.done(function(data,status) {
 			console.log("in done checker")
-			localStorage.setItem('USER',JSON.stringify(data.user));
-			localStorage.setItem('RDV', data.token);
+			// localStorage.setItem('USER',JSON.stringify(data.user));
+			// localStorage.setItem('ifa', data.token);
 			if(window.location.pathname == "/login"){
 				window.location.href = "/";
 			}
@@ -57,7 +57,7 @@ function check(){
 }
 
 function getToken() {
-  const token = localStorage.getItem('RDV');
+  const token = localStorage.getItem('fifa');
   if (typeof(token) === "undefined" || !token || token === '')
     return null;
   return token;

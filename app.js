@@ -9,7 +9,9 @@ var cookieParser = require('cookie-parser');
 var session      = require('express-session');
 var compression = require('compression');
 var _ = require("underscore");
-
+var bcrypt = require('bcrypt-nodejs');
+var salt = bcrypt.genSaltSync(10);
+var passport = require('passport')
 
 var mainRoutes = require('./backend/routes/MainRoutes');
 //====== db require files ==========
@@ -29,6 +31,10 @@ app.use(bodyParser.json());
 app.set('views', __dirname + '/client/views');
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
+// required for passport
+app.use(session({ secret: 'letthegamebegins' })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
 app.use(cookieParser());
 
 // required for cookie session
@@ -162,15 +168,6 @@ var sessionChecker = (req, res, next) => {
 // });
 
 
-// route for user logout
-app.get('/logout', (req, res) => {
-    if (req.session.user && req.cookies.user_sid) {
-        res.clearCookie('user_sid');
-        res.redirect('/');
-    } else {
-        res.redirect('/login');
-    }
-});
 
 
 // =========================================================================
@@ -182,7 +179,26 @@ app.use(function(req, res, next) {
     next();
 });
 
-
+var usernum =0;
+// app.use(function (req, res, next) {
+//   // check if client sent cookie
+//   var cookie = req.cookies.cookieName;
+//   if (cookie === undefined)
+//   {
+//     // no: set a new cookie
+//     var randomNumber=Math.random().toString();
+//     randomNumber=randomNumber.substring(2,randomNumber.length);
+//     usernum++;
+//     res.cookie('cookieName',usernum, { maxAge: 900000, httpOnly: false });
+//     console.log('cookie created successfully');
+//   }
+//   else
+//   {
+//     // yes, cookie was already present
+//     console.log('cookie exists', cookie);
+//   }
+//   next(); // <-- important!
+// });
 // normal routes ===============================================================
 app.use('/', mainRoutes);
 

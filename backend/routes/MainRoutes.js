@@ -20,11 +20,12 @@ router.route('/update').get(mainController.update);
 router.route('/insert').get(mainController.insert);
 router.route('/database').get(mainController.database);
 router.route('/report').get(mainController.report);
-
+router.route('/manager').get(mainController.manager);
 router.route('/sql').get(mainController.sql);
 
 router.route('/login').get(mainController.login);
 router.route('/signup').get(mainController.signup);
+router.route('/logout').get(mainController.logout);
 
 //==============================================================
 //================  SPECIAL GET REQUEST ========================
@@ -36,8 +37,9 @@ router.route('/signup').get(mainController.signup);
 //==============================================================
 //================== POST REQUEST ROUTER =======================
 //==============================================================
+router.route('/login').post(mainController.loginpost);
+router.route('/signup').post(mainController.signuppost);
 
-router.route('/mem').post(mainController.mem);
 
 
 module.exports = router;

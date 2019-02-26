@@ -1,3 +1,5 @@
+
+<link rel="stylesheet" href="styles/menu.css">
 <ul class="menu cf">
     <li><a href="/">Home</a></li>
     <li><a href="search">Search</a> </li>
@@ -5,6 +7,14 @@
     <li><a href="insert">Insert</a></li>
 	<li><a href="database">Database</a></li>
 	<li><a href="report">Report</a></li>
-    <li><a href="procedures">Procedures</a></li>
-    <li><a href="procedures">Login</a></li>
+    <li><a href="procedures">Match</a></li>
+    <li><a href="procedures">Player</a></li>
+    <% if (!user) { %>
+        <li><a href="login">Login</a></li>
+    <% } %>
+    <% if (user) { %>
+        <li><a href="manager"><%= user.first_name %></a></li>
+        <li><a href="logout">logout</a></li>
+    <% } %>
+    
 </ul>

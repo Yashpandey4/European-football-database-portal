@@ -22,7 +22,7 @@
                <form class="login-form" id="loginform" onSubmit="mylogin();return false;" >
                   <div class="form-group">
                      <label for="email">Email Adderss</label>
-                     <input type="email" name="login_id" id="loginemail" required>
+                     <input type="email" name="email" id="loginemail" required>
                   </div>
 
                   <div class="form-group">
@@ -48,12 +48,12 @@
 
                   <div class="form-group">
                      <label for="name">First Name</label>
-                     <input type="text" name="first_name" id="name" class="name">
+                     <input type="text" name="name" id="name" class="name">
                      <span class="error"></span>
                   </div>
                   <div class="form-group">
                      <label for="name">Last Name</label>
-                     <input type="text" name="last_name" id="Lname" class="Lname">
+                     <input type="text" name="Lname" id="Lname" class="Lname">
                      <span class="error"></span>
                   </div>
 
@@ -111,11 +111,11 @@
                      <label for="clg">Referral Code<b>(optional)</b></label>
                      <input type="text" name="referral_code" id="reff" class="ref">
 
-                  </div> -->
+                  </div> 
             <div id="otp" style="display:none;">
               <label>OTP</label>
               <input type="otp" name="otp">
-            </div>
+            </div>-->
 					  <div class="buttons signup-form">
 						  <button  type="submit" value=""   class="slide">Signup Now</button>
 				     </div>
@@ -145,12 +145,18 @@ el.style.display = "none";
       $.each($('#loginform').serializeArray(), function(_, kv) {
         formdata[kv.name] = kv.value;
       });
-      $.post("/api/login",formdata)
+      $.post("/login",formdata)
       .done((data,status)=>{
             localStorage.setItem('USER',JSON.stringify(data.user));
             localStorage.setItem('RDV', data.token);
             console.log(status);
-            window.location.href = "/";
+            if(data.error)
+              alert(data.message);
+            else{
+              console.log("revert");
+              console.log(data);
+              window.location.href = "/manager";
+            }
       }).fail((jqXHR, textStatus, errorThrown)=>{
         alert(jqXHR.responseJSON.message);
       })
@@ -162,20 +168,18 @@ el.style.display = "none";
         paramObj[kv.name] = kv.value;
       });
       var ret = false;
-       if(paramObj.college == "other"){
-          paramObj.college = paramObj.clgName;
-       }
-       delete paramObj.clgName;
-       delete paramObj.passwordCon;
-       console.log(paramObj);
 
-        $.post("/api/register",paramObj)
+
+        $.post("/signup",paramObj)
         .done(function(data,status){
             console.log(data);
             localStorage.setItem('USER',JSON.stringify(data.user));
             localStorage.setItem('RDV', data.token);
             console.log(status);
-            window.location.href = "/";
+           if(data.error)
+            alert(data.message);
+           else
+            window.location.href = "/manager";
         }).fail(
         function(jqXHR, textStatus, errorThrown) {
           //$("#error").html(jqXHR.responseText);
@@ -192,14 +196,14 @@ el.style.display = "none";
               ret = false;
             }
         });
-
+/*
        var otp = document.getElementById("otp");
        if(!(otp.style.display == "none"))
          ret = true;
        otp.style.display = "block";
        console.log(ret);
-
-       return ret;
+*/
+       return false;
   }
 </script>
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" style="z-index: 11000; vertical-align: middle;">
