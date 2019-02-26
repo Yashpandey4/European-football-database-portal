@@ -383,6 +383,844 @@ LIMIT 10\
     }) 
 }
 
+function matchesPlayedInEachLeagueBySeason(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        season, \
+        COUNT(distinct Match.id) AS Matches_Played              \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+--WHERE country.name = 'Spain'\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY Country.name, League.name, season\
+ORDER by Country.name, League.name, season\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function teamsOrderedByNumberOfHomeMatchesPlayedBySeason(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        HT.team_long_name AS home_team,\
+        season,\
+        COUNT(distinct Match.id) AS Matches_Played         \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+--WHERE country.name = 'Spain'\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY HT.team_long_name, Country.name, League.name, season\
+ORDER by Matches_Played DESC, Country.name, League.name, season, HT.team_long_name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function teamsOrderedByNumberOfHomeMatchesPlayedOfAllTime(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        HT.team_long_name AS home_team,\
+        COUNT(distinct Match.id) AS Matches_Played         \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+--WHERE country.name = 'Spain'\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY HT.team_long_name, Country.name, League.name\
+ORDER by Matches_Played DESC, Country.name, League.name, HT.team_long_name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function teamsOrderedByNumberOfAwayMatchesPlayedBySeason(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        AT.team_long_name AS away_team,\
+        season,\
+        COUNT(distinct Match.id) AS Matches_Played         \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+--WHERE country.name = 'Spain'\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY AT.team_long_name, Country.name, League.name, season\
+ORDER by Matches_Played DESC, Country.name, League.name, season, AT.team_long_name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function teamsOrderedByNumberOfAwayMatchesPlayedOfAllTime(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        AT.team_long_name AS away_team,\
+        COUNT(distinct Match.id) AS Matches_Played         \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+--WHERE country.name = 'Spain'\
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY AT.team_long_name, Country.name, League.name\
+ORDER by Matches_Played DESC, Country.name, League.name, AT.team_long_name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topTeamsByHomeGoalsSeasonWise(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        season, \
+        HT.team_long_name AS home_team,\
+        SUM(home_team_goal) AS \"home_goals_total\"                   \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY HT.team_long_name, Country.name, League.name, season\
+ORDER BY home_goals_total DESC, Country.name, League.name, season DESC\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topTeamsByHomeGoalsOfAllTimes(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        HT.team_long_name AS home_team,\
+        SUM(home_team_goal) AS \"home_goals_total\"                   \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY HT.team_long_name, Country.name, League.name\
+ORDER BY home_goals_total DESC, Country.name, League.name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topTeamsByAwayGoalsSeasonWise(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        season, \
+        AT.team_long_name AS away_team,\
+        SUM(away_team_goal) AS \"away_goals_total\"                   \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY AT.team_long_name, Country.name, League.name, season\
+ORDER BY away_goals_total DESC, Country.name, League.name, season DESC\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topTeamsByAwayGoalsOfAllTimes(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name, \
+        AT.team_long_name AS away_team,\
+        SUM(away_team_goal) AS \"away_goals_total\"                   \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY AT.team_long_name, Country.name, League.name\
+ORDER BY away_goals_total DESC, Country.name, League.name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topWinningTeamsPerSeason(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name,\
+        season,\
+        CASE WHEN home_team_goal > away_team_goal then HT.team_long_name\
+            ELSE AT.team_long_name\
+            END AS Winning_team, \
+        COUNT(*) as num_wins            \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY Winning_team, Country.name, League.name, season\
+ORDER BY num_wins DESC, Country.name, League.name, season DESC\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topWinningTeamsOfAllTimes(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name,\
+        CASE WHEN home_team_goal > away_team_goal then HT.team_long_name\
+            ELSE AT.team_long_name\
+            END AS Winning_team, \
+        COUNT(*) as num_wins            \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY Winning_team, Country.name, League.name\
+ORDER BY num_wins DESC, Country.name, League.name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topLosingTeamsPerSeason(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name,\
+        season,\
+        CASE WHEN home_team_goal < away_team_goal then HT.team_long_name\
+            ELSE AT.team_long_name\
+            END AS Losing_team, \
+        COUNT(*) as num_loss            \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY Losing_team, Country.name, League.name, season\
+ORDER BY num_loss DESC, Country.name, League.name, season DESC\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topLosingTeamsOfAllTimes(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name,\
+        CASE WHEN home_team_goal < away_team_goal then HT.team_long_name\
+            ELSE AT.team_long_name\
+            END AS Losing_team, \
+        COUNT(*) as num_loss            \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY Losing_team, Country.name, League.name\
+ORDER BY num_loss DESC, Country.name, League.name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topDrawTeamsPerSeason(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name,\
+        season,\
+        CASE WHEN home_team_goal = away_team_goal then HT.team_long_name\
+            ELSE AT.team_long_name\
+            END AS Draw_team, \
+        COUNT(*) as num_draw          \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY draw_team, Country.name, League.name, season\
+ORDER BY num_draw DESC, Country.name, League.name, season DESC\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+function topDrawTeamsOfAllTimes(req,res){
+    var query = "SELECT  \
+        Country.name AS country_name, \
+        League.name AS league_name,\
+        CASE WHEN home_team_goal = away_team_goal then HT.team_long_name\
+            ELSE AT.team_long_name\
+            END AS Draw_team, \
+        COUNT(*) as num_draw          \
+FROM Match\
+JOIN Country on Country.id = Match.country_id\
+JOIN League on League.id = Match.league_id\
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
+WHERE country.name = 'Spain'\
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
+GROUP BY draw_team, Country.name, League.name\
+ORDER BY num_draw DESC, Country.name, League.name\
+LIMIT 20\
+;"
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByoverall_rating(req,res){
+    var query = " SELECT player_name, AVG(overall_rating) AS overall_rating_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND overall_rating > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBypotential(req,res){
+    var query = " SELECT player_name, AVG(potential) AS potential_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND potential > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBycrossing(req,res){
+    var query = " SELECT player_name, AVG(crossing) AS crossing_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND crossing > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByfinishing(req,res){
+    var query = " SELECT player_name, AVG(finishing) AS finishing_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND finishing > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByheading_accuracy(req,res){
+    var query = " SELECT player_name, AVG(heading_accuracy) AS heading_accuracy_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND heading_accuracy > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByshort_passing(req,res){
+    var query = " SELECT player_name, AVG(short_passing) AS short_passing_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND short_passing > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByvolleys(req,res){
+    var query = " SELECT player_name, AVG(volleys) AS volleys_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND volleys > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBydribbling(req,res){
+    var query = " SELECT player_name, AVG(dribbling) AS dribbling_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND dribbling > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBycurve(req,res){
+    var query = " SELECT player_name, AVG(curve) AS curve_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND curve > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByfree_kick_accuracy(req,res){
+    var query = " SELECT player_name, AVG(free_kick_accuracy) AS free_kick_accuracy_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND free_kick_accuracy > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBylong_passing(req,res){
+    var query = " SELECT player_name, AVG(long_passing) AS long_passing_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND long_passing > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByball_control(req,res){
+    var query = " SELECT player_name, AVG(ball_control) AS ball_control_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND ball_control > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByacceleration(req,res){
+    var query = " SELECT player_name, AVG(acceleration) AS acceleration_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND acceleration > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBysprint_speed(req,res){
+    var query = " SELECT player_name, AVG(sprint_speed) AS sprint_speed_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND sprint_speed > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByagility(req,res){
+    var query = " SELECT player_name, AVG(agility) AS agility_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND agility > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByreactions(req,res){
+    var query = " SELECT player_name, AVG(reactions) AS reactions_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND reactions > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBybalance(req,res){
+    var query = " SELECT player_name, AVG(balance) AS balance_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND balance > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByshot_power(req,res){
+    var query = " SELECT player_name, AVG(shot_power) AS shot_power_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND shot_power > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByjumping(req,res){
+    var query = " SELECT player_name, AVG(jumping) AS jumping_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND jumping > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBystamina(req,res){
+    var query = " SELECT player_name, AVG(stamina) AS stamina_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND stamina > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBystrength(req,res){
+    var query = " SELECT player_name, AVG(strength) AS strength_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND strength > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBylong_shots(req,res){
+    var query = " SELECT player_name, AVG(long_shots) AS long_shots_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND long_shots > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByaggression(req,res){
+    var query = " SELECT player_name, AVG(aggression) AS aggression_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND aggression > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByinterceptions(req,res){
+    var query = " SELECT player_name, AVG(interceptions) AS interceptions_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND interceptions > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBypositioning(req,res){
+    var query = " SELECT player_name, AVG(positioning) AS positioning_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND positioning > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersByvision(req,res){
+    var query = " SELECT player_name, AVG(vision) AS vision_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND vision > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBypenalties(req,res){
+    var query = " SELECT player_name, AVG(penalties) AS penalties_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND penalties > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBymarking(req,res){
+    var query = " SELECT player_name, AVG(marking) AS marking_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND marking > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBystanding_tackle(req,res){
+    var query = " SELECT player_name, AVG(standing_tackle) AS standing_tackle_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND standing_tackle > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBysliding_tackle(req,res){
+    var query = " SELECT player_name, AVG(sliding_tackle) AS sliding_tackle_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND sliding_tackle > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBygk_diving(req,res){
+    var query = " SELECT player_name, AVG(gk_diving) AS gk_diving_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND gk_diving > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBygk_handling(req,res){
+    var query = " SELECT player_name, AVG(gk_handling) AS gk_handling_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND gk_handling > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBygk_kicking(req,res){
+    var query = " SELECT player_name, AVG(gk_kicking) AS gk_kicking_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND gk_kicking > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBygk_positioning(req,res){
+    var query = " SELECT player_name, AVG(gk_positioning) AS gk_positioning_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND gk_positioning > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
+
+
+function topPlayersBygk_reflexes(req,res){
+    var query = " SELECT player_name, AVG(gk_reflexes) AS gk_reflexes_avg\
+FROM Player, Player_Attributes\
+WHERE Player.player_api_id = Player_Attributes.player_api_id AND gk_reflexes > 0\
+GROUP BY 1\
+ORDER BY 2 DESC\
+LIMIT 10\
+; "
+       connection.query(query,(err,result)=>{
+        res.json(result.rows);        
+    }) 
+}
 
 
 
