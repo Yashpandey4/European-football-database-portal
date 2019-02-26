@@ -88,7 +88,7 @@ function setter(id){
           </select>\
         </div>\
         </div>\
-    </div><section id="stat"></section>'
+    </div><section id="player"></section>'
   }
   else if(id=="stat"){
     usr.innerHTML += ' <div class="selector">\
@@ -100,12 +100,35 @@ function setter(id){
           <option onclick="statPost(3);">PLAYER  By Year</option>\
           <option onclick="statPost(4);">PLAYER  Info by Birth</option>\
           <option onclick="statPost(5);">PLAYER Rating</option>\
-          <option>TEAM</option>\
-          <option>PLAYING POSITION</option>\
           </select>\
         </div>\
         </div>\
     </div><section id="stat"></section>'
+  }else if(id=="top"){
+        usr.innerHTML += ' <div class="selector">\
+        <div class="input-select" align="center" width="480" heig>\
+          <select data-trigger="" name="choices-single-default">\
+          <option placeholder="">Category</option>\
+          <option onclick="topPost(1);">topPlayersByoverall_rating</option>\
+          <option onclick="topPost(2);">topPlayersBypotential</option>\
+          <option onclick="topPost(3);">topPlayersBycrossing</option>\
+          <option onclick="topPost(4);">topPlayersByfinishing</option>\
+          <option onclick="topPost(5);">By Heading accuracy</option>\
+          <option onclick="topPost(6);">By Short passing</option>\
+          <option onclick="topPost(7);">By short passing</option>\
+          <option onclick="topPost(9);">By dribbling</option>\
+          <option onclick="topPost(10);">By curve</option>\
+          <option onclick="topPost(11);">By free kick accuracy</option>\
+          <option onclick="topPost(12);">By  long passing</option>\
+          <option onclick="topPost(13);">By ball control</option>\
+          <option onclick="topPost(14);">By acceleration</option>\
+          <option onclick="topPost(15);">By sprint speed</option>\
+          <option onclick="topPost(16);">By agility</option>\
+          <option onclick="topPost(17);">By rection</option>\
+          </select>\
+        </div>\
+        </div>\
+    </div><section id="top"></section>'
   }
   else if(id=="coun"){
     usr.innerHTML += "<div style='text-align:center;color:white'>Your current country is :</div><br><br>"
@@ -175,10 +198,35 @@ function setter(id){
                      "
   }
   else if(id == "country"){
-	$.post("/country/list").done((data,status)=>{
-	  //console.log(data)
-	  createTable(data,usr);
-	});
+  	$.post("/country/list").done((data,status)=>{
+  	  //console.log(data)
+  	  createTable(data,usr);
+  	});
+  }else if(id == "Leagues"){
+    $.post("/country/league").done((data,status)=>{
+      //console.log(data)
+      createTable(data,usr);
+    });    
+  }else if(id == "teamAll"){
+     usr.innerHTML += '</div><section id="team"></section>'
+    console.log("team post")
+    teamPost(1);
+  }else if(id=="teamSeason"){
+     usr.innerHTML += ' <div class="selector">\
+        <div class="input-select" align="center" width="480" heig>\
+          <select data-trigger="" name="choices-single-default">\
+          <option placeholder="">Category</option>\
+          <option onclick="teamPost(1);">All Teams</option>\
+          <option onclick="teamPost(2);">PLAYER  By Height</option>\
+          <option onclick="teamPost(3);">PLAYER  By Year</option>\
+          <option onclick="teamPost(4);">PLAYER  Info by Birth</option>\
+          <option onclick="teamPost(5);">PLAYER Rating</option>\
+          </select>\
+        </div>\
+        </div>\
+    </div><section id="team"></section>'
+  }else if(id=="teamAllTime"){
+
   }
 }
 
@@ -195,6 +243,30 @@ function statPost(id){
     obj = {code:id};
     $.post("/player/stat",obj).done((data,status)=>{
     var stat = document.getElementById("stat");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+
+  })
+}
+
+function topPost(id){
+  console.log(id);
+    obj = {code:id};
+    $.post("/player/top",obj).done((data,status)=>{
+    var stat = document.getElementById("top");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+
+  })
+}
+
+function teamPost(id){
+  console.log(id);
+    obj = {code:id};
+    $.post("/team/teams",obj).done((data,status)=>{
+    var stat = document.getElementById("team");
       stat.innerHTML = "";
       console.log(data)
     createTable(data,stat);

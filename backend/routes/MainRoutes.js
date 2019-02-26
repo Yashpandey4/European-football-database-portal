@@ -23,6 +23,8 @@ router.route('/database').post(mainController.database1);
 router.route('/report').get(mainController.report);
 router.route('/manager').get(mainController.manager);
 router.route('/country').get(mainController.country);
+router.route('/league').get(mainController.league);
+router.route('/team').get(mainController.team);
 router.route('/player').get(mainController.player);
 router.route('/match').get(mainController.match);
 router.route('/sql').get(mainController.sql);
@@ -45,8 +47,11 @@ router.route('/login').post(mainController.loginpost);
 router.route('/signup').post(mainController.signuppost);
 router.route('/player/player').post(mainController.playerList);
 router.route('/player/stat').post(mainController.playerStat);
+router.route('/player/top').post(mainController.playerTop);
 router.route('/country/list').post(mainController.countryList);
 router.route('/country/add').post(mainController.countryAdd);
+router.route('/country/league').post(mainController.countryLeague);
+router.route('/team/teams').post(mainController.teams);
 
 
 
