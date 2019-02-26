@@ -37,6 +37,8 @@
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "pg": "^7.8.1",
+    "process": "^0.11.10",
+    "process-env": "^1.1.0",
     "underscore": "^1.9.1"
   }
 }

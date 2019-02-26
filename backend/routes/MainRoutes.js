@@ -19,6 +19,7 @@ router.route('/search').get(mainController.search);
 router.route('/update').get(mainController.update);
 router.route('/insert').get(mainController.insert);
 router.route('/database').get(mainController.database);
+router.route('/database').post(mainController.database1);
 router.route('/report').get(mainController.report);
 router.route('/manager').get(mainController.manager);
 router.route('/sql').get(mainController.sql);
