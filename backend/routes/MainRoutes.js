@@ -43,8 +43,9 @@ router.route('/logout').get(mainController.logout);
 //==============================================================
 router.route('/login').post(mainController.loginpost);
 router.route('/signup').post(mainController.signuppost);
-// router.route('/player/player').post(mainController.playerList);
-// router.route('/player/stat').post(mainController.playerstat);
+router.route('/player/player').post(mainController.playerList);
+router.route('/player/stat').post(mainController.playerStat);
+router.route('/country/list').post(mainController.countryList);
 
 
 

@@ -28,8 +28,8 @@
 <%include ../partials/_navbar.ejs%>
       <br>
       <ul class="menu cf"> 
-        <li><a onclick="setter('stat');">Stats</a></li>
-        <li><a onclick="setter('player')";>Players</a></li>
+        <li><a onclick="setter('country');">country List</a></li>
+        <li><a onclick="setter('addCountry')";>Add Country</a></li>
        </ul>
       
   <defs>
@@ -70,7 +70,7 @@
         // $.post("/database").done((data,status)=>{
         //   createTable(data,usr);
         // })
-        // setter("player")
+        setter("country")
       }
     </script>
 </body>
