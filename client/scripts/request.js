@@ -105,7 +105,7 @@ function setter(id){
           </select>\
         </div>\
         </div>\
-    </div>'
+    </div><section id="stat"></section>'
   }
   else if(id=="coun"){
     usr.innerHTML += "<div style='text-align:center;color:white'>Your current country is :</div><br><br>"
@@ -194,7 +194,10 @@ function statPost(id){
   console.log(id);
     obj = {code:id};
     $.post("/player/stat",obj).done((data,status)=>{
+    var stat = document.getElementById("stat");
+      stat.innerHTML = "";
       console.log(data)
-    createTable(data,usr);
+    createTable(data,stat);
+
   })
 }

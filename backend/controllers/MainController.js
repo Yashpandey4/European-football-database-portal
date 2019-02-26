@@ -445,7 +445,7 @@ function playerStat(req,res){
     if(code==1){
         playersByBirthYear(req,res);
     }else if(code == 2){
-        playersByHeight(req,res);
+        playeysByHeight(req,res);
     }
     else if(code == 3){
         playersByYearNumber(req,res);
