@@ -37,39 +37,6 @@ function createTable(data,usr){
 	}
 }
 
-// function createTable2(data,usr){
-
-// 		var key = Object.keys(data).length;
-// 		console.log(data[key-1])
-// 		var num2 = Object.keys(data[key]);
-// 		for(var j=0;j<1;j++)
-// 		{
-// 			var kh = Object.keys(data[key][j]);
-// 			var b = Object.keys(kh).length;
-// 			usr.innerHTML += "<div style='position:absolute'>";
-// 			var myTable= "<table class='stab' border='1'><tr>";
-// 			for(var k=0;k<b;k++)
-// 			{
-// 				myTable+= "<td style='color: red;'>"+kh[k]+"</td>";
-// 			}
-// 			myTable+="</tr>"
-// 			}
-// 			for(var j=0;j<num2;j++)
-// 			{
-// 				var kh = Object.keys(data[key][j]);
-// 				myTable+="<tr>";
-// 				for(var k=0;k<kh.length;k++)
-// 				{
-// 					var d = data[key][j][kh[k]];
-// 					myTable+="<td>"  + d + "</td>";
-// 				}
-// 				myTable+="</tr>";
-// 			}
-// 		  myTable+="</table><br><br>"
-// 		  usr.innerHTML += myTable;
-// 		  usr.innerHTML += "</div>";
-// }
-
 function setter(id){
   var usr = document.getElementById("hello");
   usr.innerHTML = "";
@@ -216,17 +183,35 @@ function setter(id){
         <div class="input-select" align="center" width="480" heig>\
           <select data-trigger="" name="choices-single-default">\
           <option placeholder="">Category</option>\
-          <option onclick="teamPost(1);">All Teams</option>\
-          <option onclick="teamPost(2);">PLAYER  By Height</option>\
-          <option onclick="teamPost(3);">PLAYER  By Year</option>\
-          <option onclick="teamPost(4);">PLAYER  Info by Birth</option>\
-          <option onclick="teamPost(5);">PLAYER Rating</option>\
+          <option onclick="teamPost(2);">Best Teams</option>\
+          <option onclick="teamPost(3);">By Home Matches</option>\
+          <option onclick="teamPost(4);">By Away Matches</option>\
+          <option onclick="teamPost(5);">By Home Goals</option>\
+          <option onclick="teamPost(6);">By Away Goals</option>\
+          <option onclick="teamPost(7);">Top Losing Team</option>\
+          <option onclick="teamPost(8);">Top Winning Team</option>\
+          <option onclick="teamPost(9);">Top Draw Team</option>\
           </select>\
         </div>\
         </div>\
     </div><section id="team"></section>'
   }else if(id=="teamAllTime"){
-
+     usr.innerHTML += ' <div class="selector">\
+        <div class="input-select" align="center" width="480" heig>\
+          <select data-trigger="" name="choices-single-default">\
+          <option placeholder="">Category</option>\
+          <option onclick="teamPost(12);">Best Teams</option>\
+          <option onclick="teamPost(13);">By Home Matches</option>\
+          <option onclick="teamPost(14);">By Away Matches</option>\
+          <option onclick="teamPost(15);">By Home Goals</option>\
+          <option onclick="teamPost(16);">By Away Goals</option>\
+          <option onclick="teamPost(17);">Top Losing Team</option>\
+          <option onclick="teamPost(18);">Top Winning Team</option>\
+          <option onclick="teamPost(19);">Top Draw Team</option>\
+          </select>\
+        </div>\
+        </div>\
+    </div><section id="team"></section>'
   }
 }
 
