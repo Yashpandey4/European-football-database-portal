@@ -133,7 +133,7 @@ function setter(id){
   else if(id=="coun"){
     usr.innerHTML += "<div style='text-align:center;color:white'>Your current country is :</div><br><br>"
     usr.innerHTML += '<div style="text-align:center;color:white">Update your country:<br><br><div class="selector">\
-            <div class="input-select" align="center" width="480" heig>\
+            <div class="input-select" align="center" width="480" height=auto>\
               <select data-trigger="" name="choices-single-default">\
                 <option placeholder="">Category</option>\
                 <option onclick="poster();">PLAYER NAME</a></option>\
@@ -172,7 +172,7 @@ function setter(id){
                      <input type='text' id='sn' name='sn' required><br><br>\
                      <label for='league'>League</label><br><br>\
                      <div class='selector'  id='league'>\
-            <div class='input-select' width='480' heig>\
+            <div class='input-select' width='480' height=auto>\
               <select data-trigger='' name='choices-single-default'>\
                 <option placeholder=''>Category</option>\
                 <option onclick='poster();''>PLAYER NAME</a></option>\
@@ -246,6 +246,8 @@ function statPost(id){
       stat.innerHTML = "";
       console.log(data)
     createTable(data,stat);
+    parsedData = parseData(data);
+    plot(parsedData);
 
   })
 }
@@ -270,6 +272,6 @@ function teamPost(id){
       stat.innerHTML = "";
       console.log(data)
     createTable(data,stat);
-
+      
   })
 }
