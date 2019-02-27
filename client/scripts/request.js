@@ -227,6 +227,21 @@ function setter(id){
     </div><section id="team"></section>'
   }else if(id=="teamAllTime"){
 
+  }else if(id=="match_season"){
+    usr.innerHTML = `<section id="match"></season>`;
+    matchPost(1);
+  }else if(id=="match_country"){
+    usr.innerHTML = `<section id="match"></season>`;
+    matchPost(2);
+  }else if(id=="match_league"){
+    usr.innerHTML = `<section id="match"></season>`;
+    matchPost(3);
+  }else if(id=="league_season"){
+    usr.innerHTML = `<section id="league"></season>`;
+    leaguePost(1);
+  }else if(id=="league_performance"){
+    usr.innerHTML = `<section id="league"></season>`;
+    leaguePost(2);
   }
 }
 
@@ -275,3 +290,28 @@ function teamPost(id){
       
   })
 }
+
+function matchPost(id){
+  console.log(id);
+    obj = {code:id};
+    $.post("/match/stat",obj).done((data,status)=>{
+    var stat = document.getElementById("match");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+      
+  })
+}
+
+function leaguePost(id){
+  console.log(id);
+    obj = {code:id};
+    $.post("/league/stat",obj).done((data,status)=>{
+    var stat = document.getElementById("league");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+      
+  })
+}
+
