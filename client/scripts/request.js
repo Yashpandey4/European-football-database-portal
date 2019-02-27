@@ -37,6 +37,8 @@ function createTable(data,usr){
 	}
 }
 
+var lastcall = 1;
+
 function setter(id){
   var usr = document.getElementById("hello");
   usr.innerHTML = "";
@@ -46,12 +48,7 @@ function setter(id){
           <select data-trigger="" name="choices-single-default">\
           <option placeholder="">Category</option>\
           <option onclick="playerPost(1);">PLAYER  By Height</option>\
-          <option onclick="playerPost(2);">PLAYER  By </option>\
-          <option onclick="playerPost(3);">PLAYER  By Year</option>\
-          <option onclick="playerPost(4);">PLAYER  Info by Birth</option>\
-          <option onclick="playerPost(5);">PLAYER Rating</option>\
-          <option>TEAM</option>\
-          <option>PLAYING POSITION</option>\
+          <option onclick="playerPost(2);">PLAYER  By Info</option>\
           </select>\
         </div>\
         </div>\
@@ -175,26 +172,28 @@ function setter(id){
       createTable(data,usr);
     });    
   }else if(id == "teamAll"){
-     usr.innerHTML += '</div><section id="team"></section>'
+     usr.innerHTML += `<div align="center"><br><input type="number" step="1" value="10" onchange="teamPost(1,$(this).val());"
+     placeholder="limit"></input></div><br><br></div><section id="team"></section>`
     console.log("team post")
     teamPost(1);
   }else if(id=="teamSeason"){
-     usr.innerHTML += ' <div class="selector">\
-        <div class="input-select" align="center" width="480" heig>\
-          <select data-trigger="" name="choices-single-default">\
-          <option placeholder="">Category</option>\
-          <option onclick="teamPost(2);">Best Teams</option>\
-          <option onclick="teamPost(3);">By Home Matches</option>\
-          <option onclick="teamPost(4);">By Away Matches</option>\
-          <option onclick="teamPost(5);">By Home Goals</option>\
-          <option onclick="teamPost(6);">By Away Goals</option>\
-          <option onclick="teamPost(7);">Top Losing Team</option>\
-          <option onclick="teamPost(8);">Top Winning Team</option>\
-          <option onclick="teamPost(9);">Top Draw Team</option>\
-          </select>\
-        </div>\
-        </div>\
-    </div><section id="team"></section>'
+     usr.innerHTML += ` <div class="selector">
+        <div class="input-select" align="center" width="480" heig>
+          <select data-trigger="" name="choices-single-default">
+          <option placeholder="">Category</option>
+          <option onclick="teamPost(2);">Best Teams</option>
+          <option onclick="teamPost(3);">By Home Matches</option>
+          <option onclick="teamPost(4);">By Away Matches</option>
+          <option onclick="teamPost(5);">By Home Goals</option>
+          <option onclick="teamPost(6);">By Away Goals</option>
+          <option onclick="teamPost(7);">Top Losing Team</option>
+          <option onclick="teamPost(8);">Top Winning Team</option>
+          <option onclick="teamPost(9);">Top Draw Team</option>
+          </select>
+        </div>
+        </div>
+    </div><div align="center"><br><input type="number" step="1" value="10" onchange="updateteamPost($(this).val());"
+     placeholder="limit"></input></div><br><br><section id="team"></section>`
   }else if(id=="teamAllTime"){
     usr.innerHTML += ' <div class="selector">\
         <div class="input-select" align="center" width="480" heig>\
@@ -266,9 +265,24 @@ function topPost(id){
   })
 }
 
-function teamPost(id){
+function teamPost(id,val){
+  lastcall = id;
   console.log(id);
-    obj = {code:id};
+    obj = {code:id,value:val};
+    $.post("/team/teams",obj).done((data,status)=>{
+    var stat = document.getElementById("team");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+      
+  })
+}
+
+
+function updateteamPost(val){
+  var id = lastcall;
+  console.log(id);
+    obj = {code:id,value:val};
     $.post("/team/teams",obj).done((data,status)=>{
     var stat = document.getElementById("team");
       stat.innerHTML = "";

@@ -66,7 +66,7 @@ function insert(req,res){
 
 function manager(req,res){
     console.log(req.session.user);
-    res.render('report/report.ejs',{
+    res.render('manager/manager.ejs',{
         user:req.session.user
     })
 }
@@ -313,13 +313,26 @@ function signuppost(req,res,next){
     });   
 }
 
+function updateCountry(req,res){
+    var usr = req.session.user.id;
+    var query = "UPDATE manager set country_id = $1 where id = $2";
+    connection.query(query,[req.body.id,usr],(err,result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.send({error:false,message:"updated"});
+        }
+    })
+}
 
 function postform(req,res,next){
     console.log(req.body);
     var query = 'Insert INTO form (name , email , phone , message) VALUES(' +'\''+req.body.name+'\''+','+'\''+req.body.email+'\''+','+'\''+req.body.phone+'\''+','+'\''+req.body.message+'\''+')';
     console.log(query);
     var out = database.getDataFromTable(query,function(err,result){
-        if(err) throw err;
+        if(err){
+         console.log(err);
+        }
         else
         {
             console.log("form submitted");
@@ -619,14 +632,10 @@ function playerList(req,res){
     if(code==1){
         playerByHeight(req,res);
     }else if(code == 2){
-        playeysByHeight(req,res);
+        sortByPlayerInfo(req,res);
     }
-    else if(code == 3){
-        playersByYearNumber(req,res);
-    }else if(code == 4){
-        playerInfoByBirthYear(req,res);
-    }else if(code ==5){
-        RatingsByYearNumber(req,res)
+    else{
+
     }
 }
 
@@ -649,6 +658,32 @@ function playerByHeight(req,res){
     }) 
 }
 
+function sortByPlayerInfo(req,res){
+    var query = `SELECT 
+p.player_name,
+--*,
+EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",
+-- 2019-(CAST(coalesce(year_born, '0') AS integer)) AS \"player_age\"
+2019::int-(select EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int) AS age,
+pa.overall_rating,pa.potential,pa.preferred_foot,pa.attacking_work_rate,pa.defensive_work_rate,pa.crossing,pa.finishing,pa.heading_accuracy,pa.short_passing,pa.volleys,pa.dribbling,pa.curve,pa.free_kick_accuracy,pa.long_passing,pa.ball_control,pa.acceleration,pa.sprint_speed,pa.agility,pa.reactions,pa.balance,pa.shot_power,pa.jumping,pa.stamina,pa.strength,pa.long_shots,pa.aggression,pa.interceptions,pa.positioning,pa.vision,pa.penalties,pa.marking,pa.standing_tackle,pa.sliding_tackle,pa.gk_diving,pa.gk_handling,pa.gk_kicking,pa.gk_positioning,pa.gk_reflexes
+FROM Player AS p
+INNER JOIN Player_Attributes AS pa 
+ON p.player_api_id = pa.player_api_id
+--WHERE (Insert Sorting Attribute here > Insert threshhold value)
+ORDER BY p.player_name
+LIMIT 10
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
+    }) 
+}
 
 //===========================================================
 //=============== league               ======================
@@ -852,29 +887,6 @@ LIMIT 20
 
 
 
-
-
-
-function sortByPlayerInfo(req,res){
-    var query = "SELECT \
-p.player_name,\
---*,\
-EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS \"year_born\",\
--- 2019-(CAST(coalesce(year_born, '0') AS integer)) AS \"player_age\"\
-2019::int-(select EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int) AS age,\
-pa.overall_rating,pa.potential,pa.preferred_foot,pa.attacking_work_rate,pa.defensive_work_rate,pa.crossing,pa.finishing,pa.heading_accuracy,pa.short_passing,pa.volleys,pa.dribbling,pa.curve,pa.free_kick_accuracy,pa.long_passing,pa.ball_control,pa.acceleration,pa.sprint_speed,pa.agility,pa.reactions,pa.balance,pa.shot_power,pa.jumping,pa.stamina,pa.strength,pa.long_shots,pa.aggression,pa.interceptions,pa.positioning,pa.vision,pa.penalties,pa.marking,pa.standing_tackle,pa.sliding_tackle,pa.gk_diving,pa.gk_handling,pa.gk_kicking,pa.gk_positioning,pa.gk_reflexes\
-FROM Player AS p\
-INNER JOIN Player_Attributes AS pa \
-ON p.player_api_id = pa.player_api_id\
---WHERE (Insert Sorting Attribute here > Insert threshhold value)\
-ORDER BY p.player_name\
-LIMIT 10\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
-
 function teamInfo(req,res){
     var query = "SELECT * FROM Team, Team_Attributes\
 WHERE Team.team_api_id = Team_Attributes.team_api_id\
@@ -935,9 +947,13 @@ function teamList(req,res){
 
 
 function listAllTeams(req,res){
-    var query = "SELECT * FROM Team ORDER BY team_long_name LIMIT 10;"
+    var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
+    var query = "SELECT * FROM Team ORDER BY team_long_name LIMIT $1;"
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -951,7 +967,10 @@ function listAllTeams(req,res){
 // ==========  Season wise =================
 
 function bestTeamsSeasonWise(req,res){
-
+    var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT Country.name AS country_name, 
         League.name AS league_name,
         HT.team_long_name,
@@ -974,10 +993,10 @@ WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY HT.team_long_name, Country.name, League.name, season
 --HAVING count(distinct stage) > 10
 ORDER BY total_goals DESC, Country.name, League.name, season DESC
-LIMIT 10
+LIMIT $1
 ;`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -991,7 +1010,7 @@ LIMIT 10
 function teamsOrderedByNumberOfHomeMatchesPlayedBySeason(req,res){
     var val = req.body.value;
     if(!val){
-        val = "Spain";
+        val = 10;
     }
     var query = `SELECT  
         Country.name AS country_name, 
@@ -1008,10 +1027,10 @@ LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
 WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY HT.team_long_name, Country.name, League.name, season
 ORDER by Matches_Played DESC, Country.name, League.name, season, HT.team_long_name
-LIMIT 20
+LIMIT $1
 ;`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -1023,6 +1042,10 @@ LIMIT 20
 }
 
 function teamsOrderedByNumberOfAwayMatchesPlayedBySeason(req,res){
+       var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT  
         Country.name AS country_name, 
         League.name AS league_name, 
@@ -1038,10 +1061,10 @@ LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
 WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY AT.team_long_name, Country.name, League.name, season
 ORDER by Matches_Played DESC, Country.name, League.name, season, AT.team_long_name
-LIMIT 20
+LIMIT $1
 ;`
     var obj =[]
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -1053,6 +1076,10 @@ LIMIT 20
 }
 
 function topTeamsByHomeGoalsSeasonWise(req,res){
+    var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT  
         Country.name AS country_name, 
         League.name AS league_name, 
@@ -1068,10 +1095,10 @@ WHERE country.name = 'Spain'
 --WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY HT.team_long_name, Country.name, League.name, season
 ORDER BY home_goals_total DESC, Country.name, League.name, season DESC
-LIMIT 20
+LIMIT $1
 ;`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -1083,6 +1110,10 @@ LIMIT 20
 }
 
 function topTeamsByAwayGoalsSeasonWise(req,res){
+    var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT  
         Country.name AS country_name, 
         League.name AS league_name, 
@@ -1098,10 +1129,10 @@ WHERE country.name = 'Spain'
 --WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY AT.team_long_name, Country.name, League.name, season
 ORDER BY away_goals_total DESC, Country.name, League.name, season DESC
-LIMIT 20
+LIMIT $1
 ;`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -1114,6 +1145,10 @@ LIMIT 20
 
 
 function topLosingTeamsPerSeason(req,res){
+        var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT  
         Country.name AS country_name, 
         League.name AS league_name,
@@ -1131,10 +1166,10 @@ WHERE country.name = 'Spain'
 --WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY Losing_team, Country.name, League.name, season
 ORDER BY num_loss DESC, Country.name, League.name, season DESC
-LIMIT 20
+LIMIT $1
 ;`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -1146,6 +1181,10 @@ LIMIT 20
 }
 
 function topWinningTeamsPerSeason(req,res){
+        var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT  
         Country.name AS country_name, 
         League.name AS league_name,
@@ -1163,10 +1202,10 @@ WHERE country.name = 'Spain'
 --WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY Winning_team, Country.name, League.name, season
 ORDER BY num_wins DESC, Country.name, League.name, season DESC
-LIMIT 20
+LIMIT $1
 ;`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
@@ -1178,6 +1217,10 @@ LIMIT 20
 }
 
 function topDrawTeamsPerSeason(req,res){
+        var val = req.body.value;
+    if(!val){
+        val = 10;
+    }
     var query = `SELECT  
         Country.name AS country_name, 
         League.name AS league_name,
@@ -1195,9 +1238,9 @@ WHERE country.name = 'Spain'
 --WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
 GROUP BY draw_team, Country.name, League.name, season
 ORDER BY num_draw DESC, Country.name, League.name, season DESC
-LIMIT 20`
+LIMIT $1`
     var obj =[];
-    connection.query(query,(err,result)=>{
+    connection.query(query,[val],(err,result)=>{
         if(err){
             console.log(err);
         }
