@@ -37,7 +37,9 @@ module.exports = {
     matchStat:matchStat,
     leagueStat:leagueStat,
     getAllCountries:getAllCountries,
-    updateCountry:updateCountry
+    updateCountry:updateCountry,
+    getAllLeague:getAllLeague,
+    addTeam:addTeam
 }
 
 //==========================================================
@@ -329,21 +331,21 @@ function updateCountry(req,res){
     })
 }
 
-function postform(req,res,next){
-    console.log(req.body);
-    var query = 'Insert INTO form (name , email , phone , message) VALUES(' +'\''+req.body.name+'\''+','+'\''+req.body.email+'\''+','+'\''+req.body.phone+'\''+','+'\''+req.body.message+'\''+')';
-    console.log(query);
-    var out = database.getDataFromTable(query,function(err,result){
-        if(err){
-         console.log(err);
-        }
-        else
-        {
-            console.log("form submitted");
-            res.redirect('/');
-        }
-    });
-}
+// function postform(req,res,next){
+//     console.log(req.body);
+//     var query = 'Insert INTO form (name , email , phone , message) VALUES(' +'\''+req.body.name+'\''+','+'\''+req.body.email+'\''+','+'\''+req.body.phone+'\''+','+'\''+req.body.message+'\''+')';
+//     console.log(query);
+//     var out = database.getDataFromTable(query,function(err,result){
+//         if(err){
+//          console.log(err);
+//         }
+//         else
+//         {
+//             console.log("form submitted");
+//             res.redirect('/');
+//         }
+//     });
+// }
 
 function database(req,res){
    //getAllDbImage(req,res);
@@ -419,6 +421,25 @@ function sql(req,res){
     connection.query(query,[],(err,result)=>{
     
     res.json(result.rows);        
+    })
+}
+
+function getAllLeague(req,res){
+    var query = "select id,name from league;"
+    connection.query(query,(err,result)=>{
+        res.json(result.rows);
+    })
+}
+
+function addTeam(req,res){
+    var query = "Insert into team (team_long_name,team_short_name) VALUES($1,$2)"
+    connection.query(query,[req.body.teamName,req.body.shortName],(err,result)=>{
+        if(err){
+            console.log(err);
+            res.send({error:true,message:err});
+        }else{
+            res.send({error:false,message:"New Team added"});
+        }
     })
 }
 
