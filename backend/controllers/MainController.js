@@ -322,6 +322,8 @@ function updateCountry(req,res){
         if(err){
             console.log(err);
         }else{
+            // connection.query("")
+            req.session.user.country_id = req.body.id;//result.rows[0]
             res.send({error:false,message:"updated"});
         }
     })
