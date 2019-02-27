@@ -133,29 +133,26 @@ function setter(id){
                      "
   }
   else if(id=="cteam"){
-    usr.innerHTML += "<h1 style='text-align:center;color:white'>Create New Team</h1><br>"
-    usr.innerHTML += "<form style='text-align:center;color:white;padding:auto;'>\
-                      <label for='pname'>Team Name</label>\
-                     <input type='text' id='pteam' name='pteam' required><br><br>\
-                     <label for='dob'>Short Name</label>\
-                     <input type='text' id='sn' name='sn' required><br><br>\
-                     <label for='league'>League</label><br><br>\
-                     <div class='selector'  id='league'>\
-            <div class='input-select' width='480' height=auto>\
-              <select data-trigger='' name='choices-single-default'>\
-                <option placeholder=''>Category</option>\
-                <option onclick='poster();''>PLAYER NAME</a></option>\
-                <option>PLAYER ID</option>\
-                <option>NATIONALITY</option>\
-                <option>AGE</option>\
-                <option>OVERALL RATING</option>\
-                <option>TEAM</option>\
-                <option>PLAYING POSITION</option>\
-              </select>\
-            </div>\
-          </div>\
-          </form>\
-          "
+    $.post("/getLeagues").done((data,status)=>{
+      allLeagues = data;
+      usr.innerHTML += `<h1 style='text-align:center;color:white'>Create New Team</h1><br>
+                    <form style='text-align:center;color:white;padding:auto;'>
+                        <label for='pname'>Team Name</label>
+                      <input type='text' id='pteam' name='pteam' required><br><br>
+                      <label for='dob'>Short Name</label>
+                      <input type='text' id='sn' name='sn' required><br><br></form>`
+      text = "";
+
+      for(i in allLeagues){
+      text = text + `<option onclick="updateLeague(`+allLeagues[i].id+`)">`+allLeagues[i].name+`</option>`
+    } 
+    usr.innerHTML += `<div style="text-align:center;color:white">Select League:<br><br><div class="selector">
+            <div class="input-select" align="center" width="480" height=auto>
+              <select data-trigger="" name="choices-single-default">`+text+`</select>
+            </div>
+          </div>
+          </div>`
+    });
         }
   else if(id =="addCountry"){
     usr.innerHTML += "<h1 style='text-align:center;color:white'>Create New Country</h1><br>"
@@ -342,6 +339,24 @@ function changeCountry(id){
       setter("coun");
     });
   });
+}
+
+function updateLeague(id){
+  teamName = $('#hello form input#pteam').val();
+  shortName = $('#hello form input#sn').val();
+  obj = {
+    teamName:teamName,
+    shortName,shortName
+  }
+  if(teamName===null){
+    alert("Please enter Team Name ");
+  }else if(shortName===null){
+    alert("Please enter Team Name ");
+  }else{
+    $.post("/addTeam",obj).done((status,data)=>{
+      alert(data.message);
+    });
+  }
 }
 
 
