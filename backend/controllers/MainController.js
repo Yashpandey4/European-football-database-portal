@@ -36,7 +36,8 @@ module.exports = {
     teams:teamList,
     matchStat:matchStat,
     leagueStat:leagueStat,
-    getAllCountries:getAllCountries
+    getAllCountries:getAllCountries,
+    updateCountry:updateCountry
 }
 
 //==========================================================

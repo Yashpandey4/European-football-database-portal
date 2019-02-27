@@ -338,6 +338,7 @@ function changeCountry(id){
     }
     var obj ={id:id}
     $.post("/updateCountry",obj).done((data,status)=>{
+      userCountryId = id;
       setter("coun");
     });
   });
