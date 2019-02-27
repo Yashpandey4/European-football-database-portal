@@ -896,14 +896,40 @@ function teamList(req,res){
     if(code==1){
         listAllTeams(req,res)
     }else if(code == 2){
-        playeysByHeight(req,res);
+        bestTeamsSeasonWise(req,res);
     }
     else if(code == 3){
-        playersByYearNumber(req,res);
+        teamsOrderedByNumberOfHomeMatchesPlayedBySeason(req,res);
     }else if(code == 4){
-        playerInfoByBirthYear(req,res);
+        teamsOrderedByNumberOfAwayMatchesPlayedBySeason(req,res);
     }else if(code ==5){
-        RatingsByYearNumber(req,res)
+        topTeamsByHomeGoalsSeasonWise(req,res)
+    }else if(code ==6){
+        topTeamsByAwayGoalsSeasonWise(req,res)
+    }else if(code ==7){
+        topLosingTeamsPerSeason(req,res)
+    }else if(code ==8){
+        topWinningTeamsPerSeason(req,res)
+    }else if(code ==9){
+        topDrawTeamsPerSeason(req,res)
+    }
+    else if(code == 12){
+        bestTeamsOfAllTimes(req,res);
+    }
+    else if(code == 13){
+        teamsOrderedByNumberOfHomeMatchesPlayedOfAllTimes(req,res);
+    }else if(code == 14){
+        teamsOrderedByNumberOfAwayMatchesPlayedOfAllTimes(req,res);
+    }else if(code ==15){
+        topTeamsByHomeGoalsOfAllTimes(req,res)
+    }else if(code ==16){
+        topTeamsByAwayGoalsOfAllTimes(req,res)
+    }else if(code ==17){
+        topLosingTeamsOfAllTimes(req,res)
+    }else if(code ==18){
+        topWinningTeamsOfAllTimes(req,res)
+    }else if(code ==19){
+        topDrawTeamsOfAllTimes(req,res)
     }
 }
 
@@ -925,405 +951,517 @@ function listAllTeams(req,res){
 // ==========  Season wise =================
 
 function bestTeamsSeasonWise(req,res){
-    var val = req.body.value;
-    if(!val){
-        val = "Spain";
-    }
-    var query = "SELECT Country.name AS country_name, \
-        League.name AS league_name,\
-        HT.team_long_name,\
-        season,\
-        count(distinct stage) AS number_of_stages,\
-        -- count(distinct HT.team_long_name) AS number_of_teams,\
-        avg(home_team_goal) AS avg_home_team_goals, \
-        avg(away_team_goal) AS avg_away_team_goals, \
-        avg(home_team_goal-away_team_goal) AS avg_goal_dif, \
-        avg(home_team_goal+away_team_goal) AS avg_goals, \
-        sum(home_team_goal+away_team_goal) AS total_goals                                       \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
---WHERE league.name in () --best teams in a given league\
---WHERE season in () --best teams in a given season\
-GROUP BY HT.team_long_name, Country.name, League.name, season\
---HAVING count(distinct stage) > 10\
-ORDER BY total_goals DESC, Country.name, League.name, season DESC\
-LIMIT 10\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+
+    var query = `SELECT Country.name AS country_name, 
+        League.name AS league_name,
+        HT.team_long_name,
+        season,
+        count(distinct stage) AS number_of_stages,
+        -- count(distinct HT.team_long_name) AS number_of_teams,
+        avg(home_team_goal) AS avg_home_team_goals, 
+        avg(away_team_goal) AS avg_away_team_goals, 
+        avg(home_team_goal-away_team_goal) AS avg_goal_dif, 
+        avg(home_team_goal+away_team_goal) AS avg_goals, 
+        sum(home_team_goal+away_team_goal) AS total_goals                                       
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+--WHERE league.name in () --best teams in a given league
+--WHERE season in () --best teams in a given season
+GROUP BY HT.team_long_name, Country.name, League.name, season
+--HAVING count(distinct stage) > 10
+ORDER BY total_goals DESC, Country.name, League.name, season DESC
+LIMIT 10
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 function teamsOrderedByNumberOfHomeMatchesPlayedBySeason(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        HT.team_long_name AS home_team,\
-        season,\
-        COUNT(distinct Match.id) AS Matches_Played         \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
---WHERE country.name = 'Spain'\
-WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY HT.team_long_name, Country.name, League.name, season\
-ORDER by Matches_Played DESC, Country.name, League.name, season, HT.team_long_name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var val = req.body.value;
+    if(!val){
+        val = "Spain";
+    }
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        HT.team_long_name AS home_team,
+        season,
+        COUNT(distinct Match.id) AS Matches_Played         
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+--WHERE country.name = 'Spain'
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY HT.team_long_name, Country.name, League.name, season
+ORDER by Matches_Played DESC, Country.name, League.name, season, HT.team_long_name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 function teamsOrderedByNumberOfAwayMatchesPlayedBySeason(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        AT.team_long_name AS away_team,\
-        season,\
-        COUNT(distinct Match.id) AS Matches_Played         \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
---WHERE country.name = 'Spain'\
-WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY AT.team_long_name, Country.name, League.name, season\
-ORDER by Matches_Played DESC, Country.name, League.name, season, AT.team_long_name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        AT.team_long_name AS away_team,
+        season,
+        COUNT(distinct Match.id) AS Matches_Played         
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+--WHERE country.name = 'Spain'
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY AT.team_long_name, Country.name, League.name, season
+ORDER by Matches_Played DESC, Country.name, League.name, season, AT.team_long_name
+LIMIT 20
+;`
+    var obj =[]
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 function topTeamsByHomeGoalsSeasonWise(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        season, \
-        HT.team_long_name AS home_team,\
-        SUM(home_team_goal) AS \"home_goals_total\"                   \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY HT.team_long_name, Country.name, League.name, season\
-ORDER BY home_goals_total DESC, Country.name, League.name, season DESC\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        season, 
+        HT.team_long_name AS home_team,
+        SUM(home_team_goal) AS "home_goals_total"                   
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY HT.team_long_name, Country.name, League.name, season
+ORDER BY home_goals_total DESC, Country.name, League.name, season DESC
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })  
 }
 
 function topTeamsByAwayGoalsSeasonWise(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        season, \
-        AT.team_long_name AS away_team,\
-        SUM(away_team_goal) AS \"away_goals_total\"                   \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY AT.team_long_name, Country.name, League.name, season\
-ORDER BY away_goals_total DESC, Country.name, League.name, season DESC\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        season, 
+        AT.team_long_name AS away_team,
+        SUM(away_team_goal) AS "away_goals_total"                   
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY AT.team_long_name, Country.name, League.name, season
+ORDER BY away_goals_total DESC, Country.name, League.name, season DESC
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 
 function topLosingTeamsPerSeason(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name,\
-        season,\
-        CASE WHEN home_team_goal < away_team_goal then HT.team_long_name\
-            ELSE AT.team_long_name\
-            END AS Losing_team, \
-        COUNT(*) as num_loss            \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY Losing_team, Country.name, League.name, season\
-ORDER BY num_loss DESC, Country.name, League.name, season DESC\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name,
+        season,
+        CASE WHEN home_team_goal < away_team_goal then HT.team_long_name
+            ELSE AT.team_long_name
+            END AS Losing_team, 
+        COUNT(*) as num_loss            
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY Losing_team, Country.name, League.name, season
+ORDER BY num_loss DESC, Country.name, League.name, season DESC
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 function topWinningTeamsPerSeason(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name,\
-        season,\
-        CASE WHEN home_team_goal > away_team_goal then HT.team_long_name\
-            ELSE AT.team_long_name\
-            END AS Winning_team, \
-        COUNT(*) as num_wins            \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY Winning_team, Country.name, League.name, season\
-ORDER BY num_wins DESC, Country.name, League.name, season DESC\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name,
+        season,
+        CASE WHEN home_team_goal > away_team_goal then HT.team_long_name
+            ELSE AT.team_long_name
+            END AS Winning_team, 
+        COUNT(*) as num_wins            
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY Winning_team, Country.name, League.name, season
+ORDER BY num_wins DESC, Country.name, League.name, season DESC
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 
 function topDrawTeamsPerSeason(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name,\
-        season,\
-        CASE WHEN home_team_goal = away_team_goal then HT.team_long_name\
-            ELSE AT.team_long_name\
-            END AS Draw_team, \
-        COUNT(*) as num_draw          \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY draw_team, Country.name, League.name, season\
-ORDER BY num_draw DESC, Country.name, League.name, season DESC\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name,
+        season,
+        CASE WHEN home_team_goal = away_team_goal then HT.team_long_name
+            ELSE AT.team_long_name
+            END AS Draw_team, 
+        COUNT(*) as num_draw          
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY draw_team, Country.name, League.name, season
+ORDER BY num_draw DESC, Country.name, League.name, season DESC
+LIMIT 20`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
     }) 
 }
 // ==========  All Time =================
 
 function bestTeamsOfAllTimes(req,res){
-    var query = "SELECT Country.name AS country_name, \
-        League.name AS league_name,\
-        HT.team_long_name,\
-        --season,\
-        count(distinct stage) AS number_of_stages,\
-        -- count(distinct HT.team_long_name) AS number_of_teams,\
-        avg(home_team_goal) AS avg_home_team_goals, \
-        avg(away_team_goal) AS avg_away_team_goals, \
-        avg(home_team_goal-away_team_goal) AS avg_goal_dif, \
-        avg(home_team_goal+away_team_goal) AS avg_goals, \
-        sum(home_team_goal+away_team_goal) AS total_goals                                       \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
---WHERE league.name in () --best teams in a given league\
-GROUP BY HT.team_long_name, Country.name, League.name\
---HAVING count(distinct stage) > 10\
-ORDER BY total_goals DESC, Country.name, League.name\
-LIMIT 10\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT Country.name AS country_name, 
+        League.name AS league_name,
+        HT.team_long_name,
+        --season,
+        count(distinct stage) AS number_of_stages,
+        -- count(distinct HT.team_long_name) AS number_of_teams,
+        avg(home_team_goal) AS avg_home_team_goals, 
+        avg(away_team_goal) AS avg_away_team_goals, 
+        avg(home_team_goal-away_team_goal) AS avg_goal_dif, 
+        avg(home_team_goal+away_team_goal) AS avg_goals, 
+        sum(home_team_goal+away_team_goal) AS total_goals                                       
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+--WHERE league.name in () --best teams in a given league
+GROUP BY HT.team_long_name, Country.name, League.name
+--HAVING count(distinct stage) > 10
+ORDER BY total_goals DESC, Country.name, League.name
+LIMIT 10
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
 
-function teamsOrderedByNumberOfHomeMatchesPlayedOfAllTime(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        HT.team_long_name AS home_team,\
-        COUNT(distinct Match.id) AS Matches_Played         \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
---WHERE country.name = 'Spain'\
-WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY HT.team_long_name, Country.name, League.name\
-ORDER by Matches_Played DESC, Country.name, League.name, HT.team_long_name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+function teamsOrderedByNumberOfHomeMatchesPlayedOfAllTimes(req,res){
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        HT.team_long_name AS home_team,
+        COUNT(distinct Match.id) AS Matches_Played         
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+--WHERE country.name = 'Spain'
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY HT.team_long_name, Country.name, League.name
+ORDER by Matches_Played DESC, Country.name, League.name, HT.team_long_name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
-function teamsOrderedByNumberOfAwayMatchesPlayedOfAllTime(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        AT.team_long_name AS away_team,\
-        COUNT(distinct Match.id) AS Matches_Played         \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
---WHERE country.name = 'Spain'\
-WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY AT.team_long_name, Country.name, League.name\
-ORDER by Matches_Played DESC, Country.name, League.name, AT.team_long_name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+function teamsOrderedByNumberOfAwayMatchesPlayedOfAllTimes(req,res){
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        AT.team_long_name AS away_team,
+        COUNT(distinct Match.id) AS Matches_Played         
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+--WHERE country.name = 'Spain'
+WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY AT.team_long_name, Country.name, League.name
+ORDER by Matches_Played DESC, Country.name, League.name, AT.team_long_name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
 function topTeamsByHomeGoalsOfAllTimes(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        HT.team_long_name AS home_team,\
-        SUM(home_team_goal) AS \"home_goals_total\"                   \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY HT.team_long_name, Country.name, League.name\
-ORDER BY home_goals_total DESC, Country.name, League.name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        HT.team_long_name AS home_team,
+        SUM(home_team_goal) AS "home_goals_total"                   
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY HT.team_long_name, Country.name, League.name
+ORDER BY home_goals_total DESC, Country.name, League.name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
 function topTeamsByAwayGoalsOfAllTimes(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name, \
-        AT.team_long_name AS away_team,\
-        SUM(away_team_goal) AS \"away_goals_total\"                   \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY AT.team_long_name, Country.name, League.name\
-ORDER BY away_goals_total DESC, Country.name, League.name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name, 
+        AT.team_long_name AS away_team,
+        SUM(away_team_goal) AS "away_goals_total"                   
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY AT.team_long_name, Country.name, League.name
+ORDER BY away_goals_total DESC, Country.name, League.name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
 function topWinningTeamsOfAllTimes(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name,\
-        CASE WHEN home_team_goal > away_team_goal then HT.team_long_name\
-            ELSE AT.team_long_name\
-            END AS Winning_team, \
-        COUNT(*) as num_wins            \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY Winning_team, Country.name, League.name\
-ORDER BY num_wins DESC, Country.name, League.name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name,
+        CASE WHEN home_team_goal > away_team_goal then HT.team_long_name
+            ELSE AT.team_long_name
+            END AS Winning_team, 
+        COUNT(*) as num_wins            
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY Winning_team, Country.name, League.name
+ORDER BY num_wins DESC, Country.name, League.name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
 
 function topLosingTeamsOfAllTimes(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name,\
-        CASE WHEN home_team_goal < away_team_goal then HT.team_long_name\
-            ELSE AT.team_long_name\
-            END AS Losing_team, \
-        COUNT(*) as num_loss            \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY Losing_team, Country.name, League.name\
-ORDER BY num_loss DESC, Country.name, League.name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name,
+        CASE WHEN home_team_goal < away_team_goal then HT.team_long_name
+            ELSE AT.team_long_name
+            END AS Losing_team, 
+        COUNT(*) as num_loss            
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY Losing_team, Country.name, League.name
+ORDER BY num_loss DESC, Country.name, League.name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
 
 function topDrawTeamsOfAllTimes(req,res){
-    var query = "SELECT  \
-        Country.name AS country_name, \
-        League.name AS league_name,\
-        CASE WHEN home_team_goal = away_team_goal then HT.team_long_name\
-            ELSE AT.team_long_name\
-            END AS Draw_team, \
-        COUNT(*) as num_draw          \
-FROM Match\
-JOIN Country on Country.id = Match.country_id\
-JOIN League on League.id = Match.league_id\
-LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id\
-LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id\
-WHERE country.name = 'Spain'\
---WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')\
-GROUP BY draw_team, Country.name, League.name\
-ORDER BY num_draw DESC, Country.name, League.name\
-LIMIT 20\
-;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
+    var query = `SELECT  
+        Country.name AS country_name, 
+        League.name AS league_name,
+        CASE WHEN home_team_goal = away_team_goal then HT.team_long_name
+            ELSE AT.team_long_name
+            END AS Draw_team, 
+        COUNT(*) as num_draw          
+FROM Match
+JOIN Country on Country.id = Match.country_id
+JOIN League on League.id = Match.league_id
+LEFT JOIN Team AS HT on HT.team_api_id = Match.home_team_api_id
+LEFT JOIN Team AS AT on AT.team_api_id = Match.away_team_api_id
+WHERE country.name = 'Spain'
+--WHERE country.name in ('Spain', 'Germany', 'France', 'Italy', 'England')
+GROUP BY draw_team, Country.name, League.name
+ORDER BY num_draw DESC, Country.name, League.name
+LIMIT 20
+;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            obj.push({team:result.rows})
+        res.json(obj);  
+        }      
+    })
 }
 
 
