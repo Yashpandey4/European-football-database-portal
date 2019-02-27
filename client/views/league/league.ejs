@@ -29,10 +29,9 @@
       <br>
       <ul class="menu cf"> 
         <li>
-          <a onclick="setter('stat');">Stats</a>
+          <a onclick="setter('league_season');">Leagues By Season</a>
         </li>
-        <li><a onclick="setter('player')";>Players</a></li>
-        <li><a onclick="setter('top')";>Top Players</a></li>
+        <li><a onclick="setter('league_performance')";>Country Performance</a></li>
        </ul>
       
   <defs>
@@ -74,7 +73,7 @@
         // $.post("/database").done((data,status)=>{
         //   createTable(data,usr);
         // })
-        setter("player")
+        setter("league_season")
       }
     </script>
   <script src="/scripts/playerStats.js"></script>

@@ -196,7 +196,7 @@ function setter(id){
         </div>\
     </div><section id="team"></section>'
   }else if(id=="teamAllTime"){
-     usr.innerHTML += ' <div class="selector">\
+    usr.innerHTML += ' <div class="selector">\
         <div class="input-select" align="center" width="480" heig>\
           <select data-trigger="" name="choices-single-default">\
           <option placeholder="">Category</option>\
@@ -212,6 +212,23 @@ function setter(id){
         </div>\
         </div>\
     </div><section id="team"></section>'
+
+
+  }else if(id=="match_season"){
+    usr.innerHTML = `<section id="match"></season>`;
+    matchPost(1);
+  }else if(id=="match_country"){
+    usr.innerHTML = `<section id="match"></season>`;
+    matchPost(2);
+  }else if(id=="match_league"){
+    usr.innerHTML = `<section id="match"></season>`;
+    matchPost(3);
+  }else if(id=="league_season"){
+    usr.innerHTML = `<section id="league"></season>`;
+    leaguePost(1);
+  }else if(id=="league_performance"){
+    usr.innerHTML = `<section id="league"></season>`;
+    leaguePost(2);
   }
 }
 
@@ -260,3 +277,28 @@ function teamPost(id){
       
   })
 }
+
+function matchPost(id){
+  console.log(id);
+    obj = {code:id};
+    $.post("/match/stat",obj).done((data,status)=>{
+    var stat = document.getElementById("match");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+      
+  })
+}
+
+function leaguePost(id){
+  console.log(id);
+    obj = {code:id};
+    $.post("/league/stat",obj).done((data,status)=>{
+    var stat = document.getElementById("league");
+      stat.innerHTML = "";
+      console.log(data)
+    createTable(data,stat);
+      
+  })
+}
+

@@ -52,6 +52,8 @@ router.route('/country/list').post(mainController.countryList);
 router.route('/country/add').post(mainController.countryAdd);
 router.route('/country/league').post(mainController.countryLeague);
 router.route('/team/teams').post(mainController.teams);
+router.route('/match/stat').post(mainController.matchStat);
+router.route('/league/stat').post(mainController.leagueStat);
 
 
 
