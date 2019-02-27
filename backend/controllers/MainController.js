@@ -35,7 +35,8 @@ module.exports = {
     sql:sql,
     teams:teamList,
     matchStat:matchStat,
-    leagueStat:leagueStat
+    leagueStat:leagueStat,
+    getAllCountries:getAllCountries
 }
 
 //==========================================================
@@ -469,10 +470,15 @@ function leagueByCountry(req,res){
 }
 
 
-function getAllCounties(req,res){
+function getAllCountries(req,res){
     var query = 'SELECT * from country;' ;
     connection.query(query,(err,result)=>{
-    res.json(result.rows);        
+        if(err){
+            console.log(err);
+        }else{
+            res.json(result.rows);   
+        }
+         
     })
 }
 

@@ -54,6 +54,9 @@ router.route('/country/league').post(mainController.countryLeague);
 router.route('/team/teams').post(mainController.teams);
 router.route('/match/stat').post(mainController.matchStat);
 router.route('/league/stat').post(mainController.leagueStat);
+router.route('/fetchCountries').post(mainController.getAllCountries);//get countries along with ID
+router.route('/updateCountry').post(mainController.updateCountry);
+
 
 
 

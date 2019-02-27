@@ -15,6 +15,7 @@
     <% } %>
     <% if (user) { %>
         <li><a href="manager"><%= user.first_name %></a></li>
+        <hidden><%= user.country_id %></hidden>  
         <li><a href="logout">logout</a></li>
     <% } %>
     
