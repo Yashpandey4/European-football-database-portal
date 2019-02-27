@@ -39,7 +39,11 @@ module.exports = {
     getAllCountries:getAllCountries,
     updateCountry:updateCountry,
     getAllLeague:getAllLeague,
-    addTeam:addTeam
+    addTeam:addTeam,
+    updater1:updater1,
+    updater2:updater2,
+    playerget:playerget,
+    teamget:teamget
 }
 
 //==========================================================
@@ -162,18 +166,104 @@ function logout(req,res){
 //==========================================================
 //============ SPECIAL GET REQUEST =========================
 //==========================================================
-function verify(req,res){
-    var email = req.query.id.split(",")[0];
-    connection.query('UPDATE users SET verify="1" where email = ?',email,function(err,results,fields){
-        console.log('hey there');
-        console.log('results');
-        var result;
-        if(err) throw err;
-        result = parseIt(results);
+// function verify(req,res){
+//     var email = req.query.id.split(",")[0];
+//     connection.query('UPDATE users SET verify="1" where email = ?',email,function(err,results,fields){
+//         console.log('hey there');
+//         console.log('results');
+//         var result;
+//         if(err) throw err;
+//         result = parseIt(results);
 
-        console.log(results);
-        return res.redirect('/admin');
-    });
+//         console.log(results);
+//         return res.redirect('/admin');
+//     });
+// }
+
+function updater1(req,res){
+    console.log(req.body)
+    var val = req.body;
+    if(val.action=="edit"){
+        var query = "UPDATE player_attributes set potential =  $1 ,finishing = $2 , crossing = $3 where player_api_id = $4";
+        connection.query(query,[val.potential, val.finishing,val.crossing,val.api_id] ,(err,result)=>{
+            if(err){
+                console.log(err)
+            }else{
+                console.log(result)
+                res.send({error:false,message:"updated"});
+            }            
+        })
+
+    }
+}
+function updater2(req,res){
+    console.log(req.body)
+    var val = req.body;
+    if(val.action=="edit"){
+        var query = "UPDATE team_attributes set buildupplayspeed =  $1 ,buildupplaydribbling   = $2 , buildupplaypassing = $3 where team_api_id= $4";
+        connection.query(query,[val.speed, val.drib,val.pass,val.team_id] ,(err,result)=>{
+            if(err){
+                console.log(err)
+            }else{
+                console.log(result)
+                res.send({error:false,message:"updated"});
+            }            
+        })
+
+    }
+}
+function playerget(req,res){
+    var query = `SELECT 
+    DISTINCT on (p.player_api_id) p.player_api_id,
+    p.player_name,
+    --*,
+    EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int AS "year_born",
+    -- 2019-(CAST(coalesce(year_born, '0') AS integer)) AS \"player_age\"
+    2019::int-(select EXTRACT(YEAR FROM to_timestamp(p.birthday, 'YYYY-MM-DD hh24:mi:ss'))::int) AS age,
+    pa.overall_rating,pa.potential,pa.attacking_work_rate,pa.defensive_work_rate,pa.crossing,pa.finishing,pa.heading_accuracy,pa.short_passing,pa.gk_kicking,pa.gk_positioning,pa.gk_reflexes
+    FROM Player AS p
+    INNER JOIN Player_Attributes AS pa 
+    ON p.player_api_id = pa.player_api_id
+    --WHERE (Insert Sorting Attribute here > Insert threshhold value)
+    ORDER BY p.player_api_id,p.player_name
+    LIMIT 10
+    ;`
+    var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log(result)
+            obj.push({stat:result.rows})
+        res.json(obj);  
+        }      
+    }) 
+}
+function teamget(req,res){
+// function teamInfo(req,res){
+    var query = `SELECT 
+    DISTINCT on (Team.team_api_id) Team.team_api_id,
+    Team.team_long_name,
+    Team_Attributes.buildupplayspeed, 
+    Team_Attributes.buildupplayspeedclass,
+        Team_Attributes.buildupplaydribbling, 
+    Team_Attributes.buildupplaydribblingclass,
+    Team_Attributes.buildupplaypassing, 
+    Team_Attributes.buildupplaypassingclass
+    FROM Team, Team_Attributes
+WHERE Team.team_api_id = Team_Attributes.team_api_id
+ORDER BY Team.team_api_id,Team.team_long_name Limit 20;`
+var obj =[];
+    connection.query(query,(err,result)=>{
+        if(err)
+            console.log(err)
+        else{
+            obj.push({stat:result.rows})
+            res.json(obj);
+            }       
+    }) 
+// }
 }
 //===========================================================
 //========= checks role of user =============================
@@ -438,6 +528,7 @@ function addTeam(req,res){
             console.log(err);
             res.send({error:true,message:err});
         }else{
+            console.log("team added")
             res.send({error:false,message:"New Team added"});
         }
     })
@@ -915,16 +1006,6 @@ LIMIT 20
     }) 
 }
 
-
-
-function teamInfo(req,res){
-    var query = "SELECT * FROM Team, Team_Attributes\
-WHERE Team.team_api_id = Team_Attributes.team_api_id\
-ORDER BY Team.team_long_name;"
-       connection.query(query,(err,result)=>{
-        res.json(result.rows);        
-    }) 
-}
 
 
 

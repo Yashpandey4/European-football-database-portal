@@ -3,7 +3,44 @@ var userCountryId = $('hidden').text();
 console.log(userCountryId);
 
 
+
 function createTable(data,usr){
+  var num = Object.keys(data).length;
+  for(var i=0;i<num;i++)
+  {
+    var key = Object.keys(data[i]);
+    var num2 = Object.keys(data[i][key]).length;
+    for(var j=0;j<1;j++)
+    {
+      var kh = Object.keys(data[i][key][j]);
+      var b = Object.keys(kh).length;
+      usr.innerHTML += "<div style='position:absolute'>";
+      var myTable= "<table class='stab' border='1' id='example1'><tr>";
+      for(var k=0;k<b;k++)
+      {
+        myTable+= "<td style='color: red;'>"+kh[k]+"</td>";
+      }
+      myTable+="</tr>"
+      }
+      for(var j=0;j<num2;j++)
+      {
+        var kh = Object.keys(data[i][key][j]);
+        myTable+="<tr>";
+        for(var k=0;k<kh.length;k++)
+        {
+          var d = data[i][key][j][kh[k]];
+          myTable+="<td>"  + d + "</td>";
+        }
+        myTable+="</tr>";
+      }
+      myTable+="</table><br><br>"
+      usr.innerHTML += myTable;
+      usr.innerHTML += "</div>";
+  }
+}
+
+
+function createTable1(data,usr){
   var num = Object.keys(data).length;
 	for(var i=0;i<num;i++)
 	{
@@ -14,7 +51,7 @@ function createTable(data,usr){
 			var kh = Object.keys(data[i][key][j]);
 			var b = Object.keys(kh).length;
 			usr.innerHTML += "<div style='position:absolute'>";
-			var myTable= "<table class='stab' border='1'><tr>";
+			var myTable= "<table class='stab' border='1' id='example1'><tr>";
 			for(var k=0;k<b;k++)
 			{
 				myTable+= "<td style='color: red;'>"+kh[k]+"</td>";
@@ -36,6 +73,104 @@ function createTable(data,usr){
 		  usr.innerHTML += myTable;
 		  usr.innerHTML += "</div>";
 	}
+
+  $('#example1').Tabledit({
+    url: '/updaterPlayer',
+    columns: {
+        identifier: [0, 'api_id'],
+        editable: [[5,'potential'],[8,'crossing'],[9,'finishing']],
+    },
+    // [1, 'player_name'], [2, 'year_born'],[3, 'age'],
+    onDraw: function() {
+        console.log('onDraw()');
+    },
+    onSuccess: function(data, textStatus, jqXHR) {
+        console.log('onSuccess(data, textStatus, jqXHR)');
+        console.log(data);
+        console.log(textStatus);
+        console.log(jqXHR);
+    },
+    onFail: function(jqXHR, textStatus, errorThrown) {
+        console.log('onFail(jqXHR, textStatus, errorThrown)');
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(errorThrown);
+    },
+    onAlways: function() {
+        console.log('onAlways()');
+    },
+    onAjax: function(action, serialize) {
+        console.log('onAjax(action, serialize)');
+        console.log(action);
+        console.log(serialize);
+    }
+  });
+}
+
+function createTable2(data,usr){
+  var num = Object.keys(data).length;
+  for(var i=0;i<num;i++)
+  {
+    var key = Object.keys(data[i]);
+    var num2 = Object.keys(data[i][key]).length;
+    for(var j=0;j<1;j++)
+    {
+      var kh = Object.keys(data[i][key][j]);
+      var b = Object.keys(kh).length;
+      usr.innerHTML += "<div style='position:absolute'>";
+      var myTable= "<table class='stab' border='1' id='example1'><tr>";
+      for(var k=0;k<b;k++)
+      {
+        myTable+= "<td style='color: red;'>"+kh[k]+"</td>";
+      }
+      myTable+="</tr>"
+      }
+      for(var j=0;j<num2;j++)
+      {
+        var kh = Object.keys(data[i][key][j]);
+        myTable+="<tr>";
+        for(var k=0;k<kh.length;k++)
+        {
+          var d = data[i][key][j][kh[k]];
+          myTable+="<td>"  + d + "</td>";
+        }
+        myTable+="</tr>";
+      }
+      myTable+="</table><br><br>"
+      usr.innerHTML += myTable;
+      usr.innerHTML += "</div>";
+  }
+
+  $('#example1').Tabledit({
+    url: '/updaterTeam',
+    columns: {
+        identifier: [0, 'team_id'],
+        editable: [[2,'speed'], [4,'drib'],[6,'pass']],
+    },
+    onDraw: function() {
+        console.log('onDraw()');
+    },
+    onSuccess: function(data, textStatus, jqXHR) {
+        console.log('onSuccess(data, textStatus, jqXHR)');
+        console.log(data);
+        console.log(textStatus);
+        console.log(jqXHR);
+    },
+    onFail: function(jqXHR, textStatus, errorThrown) {
+        console.log('onFail(jqXHR, textStatus, errorThrown)');
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(errorThrown);
+    },
+    onAlways: function() {
+        console.log('onAlways()');
+    },
+    onAjax: function(action, serialize) {
+        console.log('onAjax(action, serialize)');
+        console.log(action);
+        console.log(serialize);
+    }
+  });
 }
 
 var lastcall = 1;
@@ -133,7 +268,7 @@ function setter(id){
                      "
   }
   else if(id=="cteam"){
-    $.post("/getLeagues").done((data,status)=>{
+    $.post("/getLeague").done((data,status)=>{
       allLeagues = data;
       usr.innerHTML += `<h1 style='text-align:center;color:white'>Create New Team</h1><br>
                     <form style='text-align:center;color:white;padding:auto;'>
@@ -230,9 +365,28 @@ function setter(id){
   }else if(id=="league_performance"){
     usr.innerHTML = `<section id="league"></season>`;
     leaguePost(2);
+  }else if(id=="uplayer"){
+    usr.innerHTML = `<section id="uplayer"></season>`;
+    uplayer();
+  }else if(id=="uteam"){
+    usr.innerHTML = `<section id="uteam"></season>`;
+    uteam(usr);
   }
 }
 
+function uplayer(usr){
+  $.post("/player/update").done((data,status)=>{
+    var stat = document.getElementById("uplayer");
+    createTable1(data,stat);
+  })
+}
+
+function uteam(usr){
+  $.post("/team/update").done((data,status)=>{
+    var stat = document.getElementById("uteam");
+    createTable2(data,stat);
+  })
+}
 
 function playerPost(id){
   var obj = {code:id};
@@ -346,14 +500,14 @@ function updateLeague(id){
   shortName = $('#hello form input#sn').val();
   obj = {
     teamName:teamName,
-    shortName,shortName
+    shortName:shortName
   }
   if(teamName===null){
     alert("Please enter Team Name ");
   }else if(shortName===null){
     alert("Please enter Team Name ");
   }else{
-    $.post("/addTeam",obj).done((status,data)=>{
+    $.post("/addTeam",obj).done((data,status)=>{
       alert(data.message);
     });
   }

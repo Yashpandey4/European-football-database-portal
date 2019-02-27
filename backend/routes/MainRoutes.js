@@ -58,7 +58,10 @@ router.route('/fetchCountries').post(mainController.getAllCountries);//get count
 router.route('/updateCountry').post(mainController.updateCountry);
 router.route('/getLeague').post(mainController.getAllLeague);
 router.route('/addTeam').post(mainController.addTeam);
-
+router.route('/updaterPlayer').post(mainController.updater1);
+router.route('/updaterTeam').post(mainController.updater2);
+router.route('/player/update').post(mainController.playerget);
+router.route('/team/update').post(mainController.teamget);
 
 
 module.exports = router;
