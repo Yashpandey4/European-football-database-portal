@@ -35,7 +35,8 @@ module.exports = {
     sql:sql,
     teams:teamList,
     matchStat:matchStat,
-    leagueStat:leagueStat
+    leagueStat:leagueStat,
+    getAllCountries:getAllCountries
 }
 
 //==========================================================
@@ -66,7 +67,7 @@ function insert(req,res){
 
 function manager(req,res){
     console.log(req.session.user);
-    res.render('report/report.ejs',{
+    res.render('manager/manager.ejs',{
         user:req.session.user
     })
 }
@@ -456,10 +457,15 @@ function leagueByCountry(req,res){
 }
 
 
-function getAllCounties(req,res){
+function getAllCountries(req,res){
     var query = 'SELECT * from country;' ;
     connection.query(query,(err,result)=>{
-    res.json(result.rows);        
+        if(err){
+            console.log(err);
+        }else{
+            res.json(result.rows);   
+        }
+         
     })
 }
 

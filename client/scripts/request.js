@@ -1,5 +1,6 @@
 // all post request for different pages and hanlding of table formulation
-
+var userCountryId = $('hidden').text();
+console.log(userCountryId);
 
 
 function createTable(data,usr){
@@ -36,6 +37,7 @@ function createTable(data,usr){
 		  usr.innerHTML += "</div>";
 	}
 }
+
 
 function setter(id){
   var usr = document.getElementById("hello");
@@ -98,22 +100,26 @@ function setter(id){
     </div><section id="top"></section>'
   }
   else if(id=="coun"){
-    usr.innerHTML += "<div style='text-align:center;color:white'>Your current country is :</div><br><br>"
-    usr.innerHTML += '<div style="text-align:center;color:white">Update your country:<br><br><div class="selector">\
-            <div class="input-select" align="center" width="480" height=auto>\
-              <select data-trigger="" name="choices-single-default">\
-                <option placeholder="">Category</option>\
-                <option onclick="poster();">PLAYER NAME</a></option>\
-                <option>PLAYER ID</option>\
-                <option>NATIONALITY</option>\
-                <option>AGE</option>\
-                <option>OVERALL RATING</option>\
-                <option>TEAM</option>\
-                <option>PLAYING POSITION</option>\
-              </select>\
-            </div>\
-          </div>\
-          </div>'
+    $.post("/fetchCountries").done((data,status)=>{
+      allCountries = data;
+      myCountry = "";
+      text = "";
+      for(i in allCountries){
+      text = text + `<option onclick="changeCountry(`+allCountries[i].id+`)">`+allCountries[i].name+`</option>`
+      if(allCountries[i].id == userCountryId){
+        myCountry = allCountries[i].name;
+      }
+    }
+      usr.innerHTML += `<div style='text-align:center;color:white'>Your current country is :`+myCountry+`</div><br><br>`
+    
+    usr.innerHTML += `<div style="text-align:center;color:white">Update your country:<br><br><div class="selector">
+            <div class="input-select" align="center" width="480" height=auto>
+              <select data-trigger="" name="choices-single-default">`+text+`</select>
+            </div>
+          </div>
+          </div>`
+    });
+    
   }
   else if(id=="cplayer"){
     usr.innerHTML += "<h1 style='text-align:center;color:white;'>Create New Player</h1><br>"
@@ -301,4 +307,27 @@ function leaguePost(id){
       
   })
 }
+
+function fetchCountries(){
+  $.post("/fetchCountries").done((data,status)=>{
+    return data;
+  });
+}
+
+function changeCountry(id){
+  $.post("/fetchCountries").done((data,status)=>{
+    allCountries = data;
+    myCountry = "";
+    for(i in allCountries){
+      if(allCountries[i].id == id){
+        myCountry = allCountries[i].name;
+      }
+    }
+    var obj ={id:id}
+    $.post("/updateCountry",obj).done((data,status)=>{
+      setter("coun");
+    });
+  });
+}
+
 
