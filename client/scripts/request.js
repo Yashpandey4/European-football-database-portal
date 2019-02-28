@@ -133,7 +133,7 @@ function setter(id){
                      "
   }
   else if(id=="cteam"){
-    $.post("/getLeagues").done((data,status)=>{
+    $.post("/getLeague").done((data,status)=>{
       allLeagues = data;
       usr.innerHTML += `<h1 style='text-align:center;color:white'>Create New Team</h1><br>
                     <form style='text-align:center;color:white;padding:auto;'>
@@ -346,8 +346,9 @@ function updateLeague(id){
   shortName = $('#hello form input#sn').val();
   obj = {
     teamName:teamName,
-    shortName,shortName
+    shortName:shortName
   }
+  console.log(obj);
   if(teamName===null){
     alert("Please enter Team Name ");
   }else if(shortName===null){
