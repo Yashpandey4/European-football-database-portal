@@ -6,7 +6,17 @@ const client = new Client({
   database: 'fifa',
   password: '1234',
   port: 5432,
-})
+});
+
+// const client = new Client({
+//   user: 'postgres',
+//   host: 'localhost',
+//   database: 'fifa',
+//   password: '1234',
+//   port: 5432,
+// });
+
+
 client.connect(function(err){
     if(!err) {
         console.log("Database is connected");
