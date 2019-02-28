@@ -502,6 +502,7 @@ function updateLeague(id){
     teamName:teamName,
     shortName:shortName
   }
+  console.log(obj);
   if(teamName===null){
     alert("Please enter Team Name ");
   }else if(shortName===null){
